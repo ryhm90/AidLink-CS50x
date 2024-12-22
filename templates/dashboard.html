@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}لوحة التحكم{% endblock %}
+
+{% block main %}
+<h1>لوحة التحكم</h1>
+    <ul>
+        <li>عدد المستفيدين: {{ beneficiaries_count }}</li>
+        <li>إجمالي الموارد الموزعة: {{ resources_total }}</li>
+    </ul>
+    <div>
+        <p>قيمة orgname هي: {{ session["role"] }}</p>
+    </div>
+    
+    <a href="{{ url_for('statistics') }}">عرض الإحصائيات</a>
+    <a href="{{ url_for('show_beneficiaries') }}">عرض المستفيدين</a>
+{% endblock %}

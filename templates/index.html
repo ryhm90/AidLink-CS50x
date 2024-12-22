@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Portfolio
+{% endblock %}
+
+{% block styles %}
+<style>
+  /* خلفية الصفحة مع تدرج لوني من الأحمر (#e53935) إلى الأزرق الغامق (#1e3c72) */
+  body {
+    background: linear-gradient(to right, #e53935, #1e3c72);
+    /* إذا أردت اللون ممتداً على كامل الارتفاع */
+    min-height: 100vh;
+    margin: 0;
+    /* لون النص الافتراضي */
+    color: #fff;
+  }
+
+  /* تهيئة عامة للعناوين داخل الصفحة */
+  h1 {
+    text-align: center;
+    margin-top: 20px;
+    font-weight: bold;
+  }
+
+  /* تنسيق الجدول مع خلفية فاتحة حتى يكون النص واضحًا */
+  .table-port {
+    background-color: #fff;
+    color: #333; /* لون الخط داخل الجدول */
+    border-radius: 5px; /* لإعطاء حواف دائرية قليلاً */
+    overflow: hidden; /* لحماية الحواف الدائرية */
+  }
+
+  /* يمكنك تخصيص لون رأس الجدول */
+  .table-port thead {
+    background-color: #3f51b5; /* أزرق بنفسجي */
+    color: #fff;
+  }
+
+  /* تخصيص عناوين الأعمدة */
+  .table-port thead th {
+    border-color: #fff;
+    text-align: center;
+  }
+
+  /* تنسيق إضافي للخلايا */
+  .table-port td, .table-port th {
+    vertical-align: middle;
+    text-align: center; /* توسيط النص */
+  }
+
+  /* صفوف الجدول البديلة */
+  .table-port tbody tr:nth-of-type(even) {
+    background-color: #f8f8f8;
+  }
+
+  /* تأثير hover */
+  .table-port tbody tr:hover {
+    background-color: #eee;
+  }
+
+  /* مسافة حول محتوى الصفحة */
+  .container {
+    padding: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block main %}
+<div class="container">
+    <h1 class="mb-4">Portfolio</h1>
+    <table class="table table-striped table-bordered table-port">
+        <thead>
+            <tr>
+                <th>Symbol</th>
+                <th>Shares</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in portfolio %}
+                <tr>
+                    <td>{{ stock.symbol }}</td>
+                    <td>{{ stock.shares }}</td>
+                    <td>{{ stock.price }}</td>
+                    <td>{{ stock.total }}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="3"><strong>Cash</strong></td>
+                <td>{{ cash }}</td>
+            </tr>
+            <tr>
+                <td colspan="3"><strong>Total</strong></td>
+                <td>{{ total }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

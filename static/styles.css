@@ -1,0 +1,115 @@
+/* حجم العلامة التجارية */
+nav .navbar-brand {
+    font-size: xx-large;
+}
+
+/* ألوان العلامة التجارية */
+nav .navbar-brand .blue {
+    color: #537fbe;
+}
+
+nav .navbar-brand .red {
+    color: #ea433b;
+}
+
+nav .navbar-brand .yellow {
+    color: #f5b82e;
+}
+
+nav .navbar-brand .green {
+    color: #2e944b;
+}
+
+/* تدرج الخلفية */
+body {
+    background: linear-gradient(to right, #e53935, #1e3c72);
+    color: white;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* النصوص */
+h1, h2, h3, h4, h5, h6 {
+    text-align: center;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* الجدول */
+.table {
+    width: 100%;
+    margin-top: 20px;
+    background-color: rgba(255, 255, 255, 0.7); /* شفافية بنسبة 70% */
+    color: #333;
+    border-radius: 15px; /* حواف دائرية */
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0; /* لمنع الفراغات بين الخلايا */
+}
+
+.table th, .table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+/* الحقول */
+input[type="text"], input[type="number"], input[type="password"], input[type="tel"], select, textarea {
+    border-radius: 5px; /* حواف مستديرة صغيرة */
+    padding: 8px;
+    border: 1px solid #ccc;
+    width: 25%; /* يجعل الحقل بعرض الحاوية */
+    box-sizing: content-box; /* يمنع تجاوز الحقل */
+    margin-bottom: 15px; /* مسافة بين الحقول */
+}
+
+/* تأثير التركيز على الحقول */
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #537fbe;
+    box-shadow: 0 0 5px rgba(83, 127, 190, 0.8);
+}
+
+/* النصوص والعلامات */
+label {
+    display: block; /* النص فوق الحقل */
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #fff;
+}
+
+/* تصميم الأزرار */
+/* تصميم الأزرار */
+.btn {
+    background: linear-gradient(to right, #4e54c8, #8f94fb); /* تدرج لوني ناعم */
+    color: white;
+    border-radius: 50px; /* حواف مستديرة بالكامل */
+    padding: 12px 24px; /* مسافات داخلية أكبر للأزرار */
+    border: none; /* إزالة الحدود */
+    font-size: 16px; /* حجم خط مناسب */
+    font-weight: bold; /* جعل النص بارزًا */
+    text-transform: uppercase; /* تحويل النصوص إلى أحرف كبيرة */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* ظل خفيف للأزرار */
+    transition: all 0.3s ease; /* تأثير حركي ناعم */
+    cursor: pointer; /* شكل اليد عند التمرير فوق الزر */
+}
+
+/* تأثير عند تمرير الماوس */
+.btn:hover {
+    background: linear-gradient(to right, #8f94fb, #4e54c8); /* عكس التدرج عند التمرير */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* تعزيز الظل */
+    transform: translateY(-3px); /* رفع الزر قليلاً */
+}
+
+/* تأثير عند الضغط */
+.btn:active {
+    transform: translateY(1px); /* إنزال الزر قليلاً */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* تقليل الظل */
+}
+
+
+/* تنسيق الحاوية */
+.form-group {
+    margin-bottom: 15px; /* مسافة بين الحقول */
+}
+
+

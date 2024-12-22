@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+
+{% block title %}إحصائيات المنظمة{% endblock %}
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+    body {
+        direction: rtl;
+        font-family: Arial, sans-serif;
+    }
+    .stat-box {
+        background-color: #f4f4f9;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 15px 0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .stat-box h4 {
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    .stat-value {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #333;
+        text-align: right;
+    }
+    .stat-value2 {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+    }
+    .stat-title {
+        font-size: 1.2em;
+        color: #777;
+        text-align: center;
+    }
+</style>
+
+</head>
+{% block main %}
+<div class="container">
+    <h1 class="text-center my-5">إحصائيات المنظمة</h1>
+
+    <div class="row">
+        <!-- Number of Beneficiaries -->
+        <div class="col-md-4">
+            <div class="stat-box">
+                <h4 class="stat-title">عدد المستفيدين الذين حصلوا على موارد</h4>
+                <div class="stat-value2">{{ beneficiaries_with_resources }}</div>
+            </div>
+        </div>
+
+        <!-- Number of Beneficiaries Today -->
+        <div class="col-md-4">
+            <div class="stat-box">
+                <h4 class="stat-title">عدد المستفيدين خلال اليوم</h4>
+                <div class="stat-value2">{{ beneficiaries_today }}</div>
+            </div>
+        </div>
+
+        <!-- Number of Beneficiaries This Month -->
+        <div class="col-md-4">
+            <div class="stat-box">
+                <h4 class="stat-title">عدد المستفيدين خلال الشهر</h4>
+                <div class="stat-value2">{{ beneficiaries_this_month }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Number of Beneficiaries This Year -->
+        <div class="col-md-4">
+            <div class="stat-box">
+                <h4 class="stat-title">عدد المستفيدين خلال السنة</h4>
+                <div class="stat-value2">{{ beneficiaries_this_year }}</div>
+            </div>
+        </div>
+
+        <!-- Total Resources Distributed -->
+        <div class="col-md-4">
+            <div class="stat-box">
+                <h4 class="stat-title">إجمالي الموارد الموزعة</h4>
+                <div class="stat-value">
+                    {% for resource, quantity in total_resources_distributed.items() %}
+                        <p>{{ resource }}: {{ quantity }} وحدة</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources Distributed Today -->
+        <div class="col-md-4">
+            <div class="stat-box">
+                <h4 class="stat-title">الموارد الموزعة خلال اليوم</h4>
+                <div class="stat-value">
+                    {% for resource, quantity in resources_today.items() %}
+                        <p>{{ resource }}: {{ quantity }} وحدة</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Resources Distributed This Month -->
+        <div class="col-md-4">
+            <div class="stat-box">
+                <h4 class="stat-title">الموارد الموزعة خلال الشهر</h4>
+                <div class="stat-value">
+                    {% for resource, quantity in resources_this_month.items() %}
+                        <p>{{ resource }}: {{ quantity }} وحدة</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Remaining Resources -->
+        <div class="col-md-4">
+            <div class="stat-box">
+                <h4 class="stat-title">إجمالي الموارد المتبقية</h4>
+                <div class="stat-value">
+                    {% for resource, quantity in remaining_resources.items() %}
+                        <p>{{ resource }}: {{ quantity }} وحدة</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock %}
+
