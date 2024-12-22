@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, width=device-width">
@@ -29,15 +29,11 @@
                         {% elif session.get("role") == "ادارة" %}
                             <li class="nav-item"><a class="nav-link" href="/search">بحث مستفيدين</a></li>
                             <li class="nav-item"><a class="nav-link" href="/users">إدارة المستخدمين</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/register">التسجيل</a></li>
                         {% endif %}
                     </ul>
                     <ul class="navbar-nav ms-auto mt-2">
                         <li class="nav-item"><a class="nav-link text-danger" href="/logout">تسجيل الخروج</a></li>
-                    </ul>
-                {% else %}
-                    <ul class="navbar-nav ms-auto mt-2">
-                        <li class="nav-item"><a class="nav-link" href="/register">التسجيل</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/login">تسجيل الدخول</a></li>
                     </ul>
                 {% endif %}
             </div>

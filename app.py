@@ -4,6 +4,8 @@ import sqlite3
 from functools import wraps
 from datetime import datetime
 import bcrypt
+import datetime
+import locale
 
 # ----------------------------------------------------------------
 #  تكوين التطبيق
@@ -260,10 +262,36 @@ def register():
         conn.commit()
         conn.close()
 
-        flash("تم التسجيل بنجاح، يمكنك الآن تسجيل الدخول.", "success")
-        return redirect(url_for("login"))
+        flash("تم التسجيل بنجاح.", "success")
+        return redirect(url_for("dashboard"))
 
     return render_template("register.html")
+
+# صفحة لوحة التحكم
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    """
+    تعرض إحصائيات بسيطة عن عدد المستفيدين وكميات الموارد المتوفرة.
+    """
+    conn = get_db()
+    cursor = conn.cursor()
+    orgname = session.get("orgname")
+
+    # إحصائيات لوحة التحكم
+    cursor.execute("SELECT COUNT(*) FROM beneficiaries WHERE org = ?", (orgname,))
+    beneficiaries_count = cursor.fetchone()[0]
+
+    cursor.execute("SELECT SUM(quantity) FROM resources WHERE org = ?", (orgname,))
+    resources_total = cursor.fetchone()[0] or 0
+
+    conn.close()
+
+    return render_template(
+        "dashboard.html", 
+        beneficiaries_count=beneficiaries_count, 
+        resources_total=resources_total
+    )
 
 # صفحة عرض المستفيدين
 @app.route("/show_beneficiaries")
@@ -441,7 +469,7 @@ def resources_distribution():
         # بدلاً من استخدام resource_name كاسم المانح، نفصلها لزيادة الوضوح
         doner_name = request.form["resource_name"]      # اسم المتبرع
         item_name = request.form["item_name"]           # اسم المورد الفعلي
-        quantity = int(request.form["quantity"])        # يجب أن يكون عددًا صحيحًا
+        quantity = int(request.form["quantity"].replace(",", ""))
 
         conn = get_db()
         cursor = conn.cursor()
@@ -480,7 +508,7 @@ def distribute():
     # رقم الهوية للمستفيدين (قد يكون لديهم أكثر من مستفيد)
     national_ids = request.form['national_ids'].split(',')
     resource_name = request.form['resource_name']
-    distribution_date = datetime.now().strftime('%Y-%m-%d')  # Today's date in YYYY-MM-DD format
+    distribution_date = datetime.date.today().isoformat()  # Today's date in YYYY-MM-DD format
     orgname = session.get("orgname")
 
     conn = get_db()
@@ -528,6 +556,8 @@ def statistics():
     """
     عرض الإحصائيات المتعلقة بالمستفيدين والموارد الموزعة.
     """
+    today = datetime.date.today().isoformat()
+
     orgname = session.get("orgname")
     conn = get_db()
     cursor = conn.cursor()
@@ -537,7 +567,7 @@ def statistics():
     beneficiaries_with_resources = cursor.fetchone()[0]
 
     # إحصائيات عدد المستفيدين خلال اليوم
-    cursor.execute("""SELECT COUNT(DISTINCT national_id) FROM resources_DE WHERE org = ? AND DATE(date) = DATE('now')""", (orgname,))
+    cursor.execute("""SELECT COUNT(DISTINCT national_id) FROM resources_DE WHERE org = ? AND date = ?""", (orgname, today))
     beneficiaries_today = cursor.fetchone()[0] or 0
 
     # إحصائيات عدد المستفيدين خلال الشهر
@@ -550,10 +580,10 @@ def statistics():
 
     # إحصائيات الموارد الموزعة
     cursor.execute("""SELECT resource_name, SUM(quantity) as quantity FROM resources_DE WHERE org = ? GROUP BY resource_name ORDER BY resource_name ASC""", (orgname,))
-    total_resources_distributed = dict(cursor.fetchall())
+    total_resources_distributed = dict(cursor.fetchall()) 
 
     # إحصائيات الموارد الموزعة خلال اليوم
-    cursor.execute("""SELECT resource_name, SUM(quantity) as quantity FROM resources_DE WHERE org = ? AND DATE(date) = DATE('now') GROUP BY resource_name ORDER BY resource_name ASC""", (orgname,))
+    cursor.execute("""SELECT resource_name, SUM(quantity) as quantity FROM resources_DE WHERE org = ? AND date = ? GROUP BY resource_name ORDER BY resource_name ASC""", (orgname, today))
     resources_today = dict(cursor.fetchall())
 
     # إحصائيات الموارد الموزعة خلال الشهر
@@ -562,7 +592,7 @@ def statistics():
 
     # إحصائيات الموارد المتبقية
     cursor.execute("""SELECT resource_name, SUM(quantity) as quantity FROM resources WHERE org = ? AND quantity > 0 GROUP BY resource_name ORDER BY resource_name ASC""", (orgname,))
-    remaining_resources = dict(cursor.fetchall())
+    remaining_resources = dict(cursor.fetchall()) 
 
 
     conn.close()
@@ -580,6 +610,15 @@ def statistics():
     )
 
 
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+
+# Create a custom filter for formatting numbers
+@app.template_filter('comma')
+def comma_filter(value):
+    try:
+        return locale.format_string("%d", value, grouping=True)
+    except (ValueError, TypeError):
+        return value
 
 
 

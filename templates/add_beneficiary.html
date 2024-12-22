@@ -9,10 +9,17 @@
         <label for="beneficiary_name" class="form-label">اسم المستفيد</label>
         <input type="text" class="form-control" id="beneficiary_name" name="beneficiary_name" required>
     </div>
-    <div class="mb-3">
-        <label for="contact_number" class="form-label">رقم الهاتف</label>
-        <input type="tel" class="form-control" id="contact_number" name="contact_number" required>
-    </div>
+<div class="mb-3">
+    <label for="contact_number" class="form-label">رقم الهاتف</label>
+    <input type="tel" 
+           class="form-control" 
+           id="contact_number" 
+           name="contact_number" 
+           required 
+           maxlength="11" 
+           pattern="\d{11}" 
+           title="يجب إدخال 11 رقمًا فقط">
+</div>
     <div class="mb-3">
         <label for="national_id" class="form-label">رقم الهوية</label>
         <input type="text" class="form-control" id="national_id" name="national_id" required>

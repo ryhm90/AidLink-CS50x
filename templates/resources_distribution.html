@@ -28,8 +28,9 @@
     <label for="item_name">اسم المادة:</label>
     <input type="text" name="item_name" class="form-control mb-2" required>
     <label for="quantity">الكمية:</label>
-    <input type="number" name="quantity" class="form-control mb-2" required>
-    <button type="submit" class="btn btn-info">إضافة مورد</button>
+    <input type="text" name="quantity" class="form-control mb-2" required 
+    oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');">
+ <button type="submit" class="btn btn-info">إضافة مورد</button>
 </form>
 
 <div class="table-responsive">
@@ -47,7 +48,7 @@
         <tr>
             <td>{{ resource.doner }}</td>
             <td>{{ resource.resource_name }}</td>
-            <td>{{ resource.quantity }}</td>
+            <td>{{ resource.quantity}}</td>
             <td>
                 <button type="button" class="btn btn-info" onclick="showNonBeneficiaries('{{ resource.resource_name }}', {{ resource.id }}, {{ resource.quantity }})">اختيار المستفيدين</button>
             </td>
@@ -144,7 +145,11 @@
                     quantityCell.appendChild(input);
                 
                     // Display the quantity that was allocated previously (if any)
-                    allocatedCell.textContent = beneficiary.quantity || 0;
+
+                    quantityCell.appendChild(input);
+                    
+                    // عرض الكمية التي تم تخصيصها سابقًا مع الفواصل
+                    allocatedCell.textContent = (beneficiary.quantity || 0).toLocaleString();
                 });
                 document.getElementById('remainingQuantity').innerText = initialQuantity;
             })
@@ -237,7 +242,15 @@
         setTimeout(() => alert.remove(), 5000);
     }
     
-    
+    document.addEventListener("DOMContentLoaded", function () {
+        const quantityCells = document.querySelectorAll("td:nth-child(3)");
+        quantityCells.forEach(cell => {
+            const number = parseInt(cell.textContent, 10);
+            if (!isNaN(number)) {
+                cell.textContent = number.toLocaleString('en-US');
+            }
+        });
+    });
     
 
 </script>
