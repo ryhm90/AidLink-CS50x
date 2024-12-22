@@ -112,7 +112,7 @@ We welcome contributions to AidLink. Please follow these steps:
 
 For inquiries or support, please contact:
 - **Email**: ryhm90@gmail.com
-- **GitHub**: [AidLink](https://github.com/ryhm90/)
+- **GitHub**: [ryhm90](https://github.com/ryhm90/)
 
 ---
 
