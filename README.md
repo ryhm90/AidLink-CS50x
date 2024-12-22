@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # AidLink
 
 AidLink is a web-based application designed to enhance the efficiency and transparency of aid distribution and management for charitable organizations. The platform allows organizations to manage beneficiaries, track resources, and generate statistical reports, all within a user-friendly interface.
@@ -112,8 +111,8 @@ We welcome contributions to AidLink. Please follow these steps:
 ## Contact
 
 For inquiries or support, please contact:
-- **Email**: support@aidlink.com
-- **GitHub**: [AidLink](https://github.com/ryhm90/AidLink-CS50x)
+- **Email**: ryhm90@gmail.com
+- **GitHub**: [AidLink](https://github.com/ryhm90/)
 
 ---
 
