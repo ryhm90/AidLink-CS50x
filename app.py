@@ -143,7 +143,6 @@ def search_beneficiaries():
 
 
 
-from werkzeug.security import generate_password_hash, check_password_hash
 
 @app.route('/users', methods=['GET', 'POST'])
 @login_required
@@ -265,32 +264,6 @@ def register():
         return redirect(url_for("login"))
 
     return render_template("register.html")
-
-# صفحة لوحة التحكم
-@app.route("/dashboard")
-@login_required
-def dashboard():
-    """
-    تعرض إحصائيات بسيطة عن عدد المستفيدين وكميات الموارد المتوفرة.
-    """
-    conn = get_db()
-    cursor = conn.cursor()
-    orgname = session.get("orgname")
-
-    # إحصائيات لوحة التحكم
-    cursor.execute("SELECT COUNT(*) FROM beneficiaries WHERE org = ?", (orgname,))
-    beneficiaries_count = cursor.fetchone()[0]
-
-    cursor.execute("SELECT SUM(quantity) FROM resources WHERE org = ?", (orgname,))
-    resources_total = cursor.fetchone()[0] or 0
-
-    conn.close()
-
-    return render_template(
-        "dashboard.html", 
-        beneficiaries_count=beneficiaries_count, 
-        resources_total=resources_total
-    )
 
 # صفحة عرض المستفيدين
 @app.route("/show_beneficiaries")

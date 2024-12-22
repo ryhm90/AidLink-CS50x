@@ -1,9 +1,13 @@
-/* حجم العلامة التجارية */
+/* العلامة التجارية */
 nav .navbar-brand {
-    font-size: xx-large;
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* ألوان العلامة التجارية */
 nav .navbar-brand .blue {
     color: #537fbe;
 }
@@ -20,96 +24,173 @@ nav .navbar-brand .green {
     color: #2e944b;
 }
 
-/* تدرج الخلفية */
+/* خلفية الجسم */
 body {
-    background: linear-gradient(to right, #e53935, #1e3c72);
-    color: white;
-    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3c72, #2a5298, #e53935);
+    color: #f8f9fa;
+    font-family: 'Arial', sans-serif;
     margin: 0;
+    padding: 0;
+    min-height: 100vh;
 }
 
-/* النصوص */
+/* العناوين */
 h1, h2, h3, h4, h5, h6 {
     text-align: center;
-    color: #fff;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+    color: #f8f9fa;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+    margin-bottom: 20px;
 }
 
 /* الجدول */
 .table {
-    width: 100%;
-    margin-top: 20px;
-    background-color: rgba(255, 255, 255, 0.7); /* شفافية بنسبة 70% */
-    color: #333;
-    border-radius: 15px; /* حواف دائرية */
+    width: 90%;
+    margin: 20px auto;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #212529;
+    border-radius: 10px;
     overflow: hidden;
-    border-collapse: separate;
-    border-spacing: 0; /* لمنع الفراغات بين الخلايا */
+    border-collapse: collapse;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .table th, .table td {
-    padding: 10px;
+    padding: 15px;
     text-align: center;
-    border: 1px solid #ddd;
-}
-/* الحقول */
-input[type="text"], input[type="number"], input[type="password"], input[type="tel"], select, textarea {
-    border-radius: 5px; /* حواف مستديرة صغيرة */
-    padding: 8px;
-    border: 1px solid #ccc;
-    width: 25%; /* يجعل الحقل بعرض الحاوية */
-    box-sizing: content-box; /* يمنع تجاوز الحقل */
-    margin-bottom: 15px; /* مسافة بين الحقول */
+    border-bottom: 1px solid #ddd;
 }
 
-/* تأثير التركيز على الحقول */
+.table th {
+    background-color: #4e54c8;
+    color: #fff;
+    font-weight: bold;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* الحقول */
+input[type="text"], input[type="number"], input[type="password"], input[type="tel"], select, textarea {
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    width: calc(100% - 24px);
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    font-size: 14px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
 input:focus, select:focus, textarea:focus {
     outline: none;
-    border-color: #537fbe;
-    box-shadow: 0 0 5px rgba(83, 127, 190, 0.8);
+    border-color: #4e54c8;
+    box-shadow: 0 0 8px rgba(78, 84, 200, 0.5);
 }
 
 /* النصوص والعلامات */
 label {
-    display: block; /* النص فوق الحقل */
-    margin-bottom: 5px;
-    font-size: 14px;
-    color: #fff;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #f8f9fa;
 }
 
-/* تصميم الأزرار */
-/* تصميم الأزرار */
+/* الأزرار */
 .btn {
-    background: linear-gradient(to right, #4e54c8, #8f94fb); /* تدرج لوني ناعم */
+    background: linear-gradient(to right, #43cea2, #185a9d);
     color: white;
-    border-radius: 50px; /* حواف مستديرة بالكامل */
-    padding: 12px 24px; /* مسافات داخلية أكبر للأزرار */
-    border: none; /* إزالة الحدود */
-    font-size: 16px; /* حجم خط مناسب */
-    font-weight: bold; /* جعل النص بارزًا */
-    text-transform: uppercase; /* تحويل النصوص إلى أحرف كبيرة */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* ظل خفيف للأزرار */
-    transition: all 0.3s ease; /* تأثير حركي ناعم */
-    cursor: pointer; /* شكل اليد عند التمرير فوق الزر */
+    border-radius: 25px;
+    padding: 12px 30px;
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-/* تأثير عند تمرير الماوس */
 .btn:hover {
-    background: linear-gradient(to right, #8f94fb, #4e54c8); /* عكس التدرج عند التمرير */
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* تعزيز الظل */
-    transform: translateY(-3px); /* رفع الزر قليلاً */
+    background: linear-gradient(to right, #185a9d, #43cea2);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px);
 }
 
-/* تأثير عند الضغط */
 .btn:active {
-    transform: translateY(1px); /* إنزال الزر قليلاً */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* تقليل الظل */
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-
-/* تنسيق الحاوية */
+/* الحاوية */
 .form-group {
-    margin-bottom: 15px; /* مسافة بين الحقول */
+    margin-bottom: 20px;
 }
 
+/* استجابة العرض */
+@media (max-width: 768px) {
+    .table {
+        font-size: 14px;
+    }
 
+    input[type="text"], input[type="number"], input[type="password"], input[type="tel"], select, textarea {
+        width: 100%;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 12px;
+    }
+}
+/* الصناديق الإحصائية */
+.stat-box {
+    background: linear-gradient(to right, #ffffff, #f4f4f9);
+    border-radius: 15px; /* حواف مستديرة بشكل أكبر */
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* تحسين الظلال */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px); /* رفع بسيط عند التمرير */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* تعزيز الظل */
+}
+
+.stat-box h4 {
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.5em; /* تكبير حجم العنوان */
+    font-weight: bold;
+    color: #4e54c8; /* لون مميز */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+    font-size: 1.5em; /* تكبير حجم النص */
+    font-weight: bold;
+    color: #2e944b; /* لون مميز للقيمة */
+    text-align: right;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #ea433b; /* لون مميز آخر */
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.stat-title {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #777;
+    text-align: center;
+    margin-top: 10px;
+}
