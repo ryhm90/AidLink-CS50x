@@ -9,7 +9,7 @@ AidLink is a web-based application designed to enhance the efficiency and transp
 ## Features
 
 ### 1. **Beneficiary Management**
-- Add, edit, and delete beneficiary records.
+- Add, edit, and delete beneficaiary records.
 - Search beneficiaries by name or national ID.
 - View detailed information, including contact details and family members.
 
@@ -122,4 +122,3 @@ Thank you for using AidLink! Together, we can make aid distribution more effecti
 
 =======
 # AidLink-CS50x
->>>>>>> 2eeb9a87385099bcd0434c6722a7d4e4fd7eb99b
