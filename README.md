@@ -1,5 +1,5 @@
 # AidLink
-#### Video Demo:  <URL [HERE](https://youtu.be/ZqMCQjAyW68)>
+#### Video Demo: [HERE](https://youtu.be/ZqMCQjAyW68)
 #### Description:
 
 AidLink is a web-based application designed to enhance the efficiency and transparency of aid distribution and management for charitable organizations. The platform allows organizations to manage beneficiaries, track resources, and generate statistical reports, all within a user-friendly interface.
