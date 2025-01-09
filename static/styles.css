@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
+
 /* العلامة التجارية */
 nav .navbar-brand {
     font-size: 2rem;
@@ -9,36 +11,36 @@ nav .navbar-brand {
 }
 
 nav .navbar-brand .blue {
-    color: #537fbe;
+    color: #E06900; /* Orange for vibrant accent */
 }
 
 nav .navbar-brand .red {
-    color: #ea433b;
+    color: #660000; /* Dark Red for emphasis */
 }
 
 nav .navbar-brand .yellow {
-    color: #f5b82e;
-}
-
-nav .navbar-brand .green {
-    color: #2e944b;
+    color: #BEB7A4; /* Muted Beige for balance */
 }
 
 /* خلفية الجسم */
 body {
-    background: linear-gradient(135deg, #1e3c72, #2a5298, #e53935);
-    color: #f8f9fa;
+    background-color: #FFFFFC; /* Soft white for readability */
+    color: #000000; /* Black for high contrast */
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
     min-height: 100vh;
+    font-family: 'Cairo', sans-serif;
+}
+* {
+    font-family: inherit;
 }
 
 /* العناوين */
 h1, h2, h3, h4, h5, h6 {
     text-align: center;
-    color: #f8f9fa;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+    color: #E06900; /* Accent color for titles */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
     margin-bottom: 20px;
 }
 
@@ -46,39 +48,33 @@ h1, h2, h3, h4, h5, h6 {
 .table {
     width: 90%;
     margin: 20px auto;
-    background-color: rgba(255, 255, 255, 0.8);
-    color: #212529;
+    background-color: #FFFFFC; /* White background */
+    color: #000000; /* Black text for readability */
     border-radius: 10px;
     overflow: hidden;
     border-collapse: collapse;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.table th, .table td {
-    padding: 15px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-}
-
 .table th {
-    background-color: #4e54c8;
-    color: #fff;
+    background-color: #E06900; /* Vibrant Orange */
+    color: #FFFFFC; /* White text for contrast */
     font-weight: bold;
 }
 
 .table tbody tr:nth-child(even) {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: #BEB7A4; /* Muted Beige for alternating rows */
 }
 
 .table tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.05); /* Subtle highlight */
 }
 
 /* الحقول */
 input[type="text"], input[type="number"], input[type="password"], input[type="tel"], select, textarea {
     border-radius: 8px;
     padding: 12px;
-    border: 1px solid #ccc;
+    border: 1px solid #BEB7A4; /* Muted Beige for borders */
     width: calc(100% - 24px);
     box-sizing: border-box;
     margin-bottom: 20px;
@@ -88,8 +84,8 @@ input[type="text"], input[type="number"], input[type="password"], input[type="te
 
 input:focus, select:focus, textarea:focus {
     outline: none;
-    border-color: #4e54c8;
-    box-shadow: 0 0 8px rgba(78, 84, 200, 0.5);
+    border-color: #E06900; /* Highlight color for focus */
+    box-shadow: 0 0 8px rgba(224, 105, 0, 0.5); /* Orange glow */
 }
 
 /* النصوص والعلامات */
@@ -98,13 +94,13 @@ label {
     margin-bottom: 8px;
     font-size: 16px;
     font-weight: bold;
-    color: #f8f9fa;
+    color: #660000; /* Dark Red for emphasis */
 }
 
 /* الأزرار */
 .btn {
-    background: linear-gradient(to right, #43cea2, #185a9d);
-    color: white;
+    background-color: #E06900; /* Vibrant Orange */
+    color: #FFFFFC; /* White for text */
     border-radius: 25px;
     padding: 12px 30px;
     border: none;
@@ -117,7 +113,7 @@ label {
 }
 
 .btn:hover {
-    background: linear-gradient(to right, #185a9d, #43cea2);
+    background-color: #660000; /* Dark Red for hover state */
     box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
     transform: translateY(-3px);
 }
@@ -127,70 +123,67 @@ label {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* الحاوية */
-.form-group {
-    margin-bottom: 20px;
-}
-
-/* استجابة العرض */
-@media (max-width: 768px) {
-    .table {
-        font-size: 14px;
-    }
-
-    input[type="text"], input[type="number"], input[type="password"], input[type="tel"], select, textarea {
-        width: 100%;
-    }
-
-    .btn {
-        padding: 10px 20px;
-        font-size: 12px;
-    }
-}
 /* الصناديق الإحصائية */
 .stat-box {
-    background: linear-gradient(to right, #ffffff, #f4f4f9);
-    border-radius: 15px; /* حواف مستديرة بشكل أكبر */
+    background-color: #FFFFFC; /* White background */
+    border: 2px solid #BEB7A4; /* Muted Beige border */
+    border-radius: 15px;
     padding: 20px;
     margin: 15px 0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* تحسين الظلال */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .stat-box:hover {
-    transform: translateY(-5px); /* رفع بسيط عند التمرير */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* تعزيز الظل */
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .stat-box h4 {
     margin-bottom: 15px;
     text-align: center;
-    font-size: 1.5em; /* تكبير حجم العنوان */
+    font-size: 1.5em;
     font-weight: bold;
-    color: #4e54c8; /* لون مميز */
+    color: #E06900; /* Accent color for headers */
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .stat-value {
-    font-size: 1.5em; /* تكبير حجم النص */
-    font-weight: bold;
-    color: #2e944b; /* لون مميز للقيمة */
-    text-align: right;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.stat-value2 {
     font-size: 1.5em;
     font-weight: bold;
-    color: #ea433b; /* لون مميز آخر */
+    color: #660000; /* Dark Red for important stats */
     text-align: center;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .stat-title {
     font-size: 1.2em;
     font-weight: 600;
-    color: #777;
+    color: #BEB7A4; /* Muted Beige for less emphasis */
     text-align: center;
     margin-top: 10px;
+}
+
+/* Ensure input and button have the same height */
+input[type="text"], button {
+    height: 38px; /* Match the height for uniformity */
+    padding: 0 10px; /* Adjust padding for balance */
+    font-size: 14px; /* Ensure font size is consistent */
+}
+
+/* Optional: Adjust button styles for better alignment */
+.btn {
+    padding: 0 15px; /* Adjust padding to maintain the size */
+    font-size: 14px;
+}
+#searchInput, .btn {
+    height: 38px; /* Same height for both */
+    padding-left: 10px; /* Padding inside input and button */
+    padding-right: 10px; /* Padding inside input and button */
+    
+}
+
+/* Align input and button properly */
+.d-flex.align-items-center {
+    display: flex;
+    align-items: center;
 }

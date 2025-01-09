@@ -6,13 +6,17 @@ from datetime import datetime
 import bcrypt
 import datetime
 import locale
+from flask_wtf.csrf import CSRFProtect
+from wtforms import StringField, PasswordField
+from wtforms.validators import InputRequired
+from flask_wtf import FlaskForm
 
 # ----------------------------------------------------------------
 #  تكوين التطبيق
 # ----------------------------------------------------------------
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # استخدم مفتاحًا سريًا حقيقيًا في الإنتاج
-
+csrf = CSRFProtect(app)
 # ----------------------------------------------------------------
 #  دوال التعامل مع قاعدة البيانات
 # ----------------------------------------------------------------
@@ -131,6 +135,7 @@ def search_beneficiaries():
         return "Access Denied", 403
 
     beneficiaries = []
+    organizations = []  # To hold organizations for the dropdown
     if request.method == 'POST':
         search_term = request.form.get('search_term', '').strip()
 
@@ -141,8 +146,14 @@ def search_beneficiaries():
         )
         beneficiaries = cursor.fetchall()
 
-    return render_template('search_beneficiaries.html', beneficiaries=beneficiaries)
+    # Fetch organizations for the dropdown
+    cursor.execute("SELECT DISTINCT orgname FROM users WHERE orgname IS NOT NULL")
+    organizations = cursor.fetchall()
 
+    # Extract organization names into a list
+    org_names = [org['orgname'] for org in organizations]
+
+    return render_template('search_beneficiaries.html', beneficiaries=beneficiaries, organizations=org_names)
 
 
 
@@ -195,14 +206,20 @@ def manage_users():
 
 
 # صفحة تسجيل الدخول
+class LoginForm(FlaskForm):
+    username = StringField('اسم المستخدم', validators=[InputRequired()])
+    password = PasswordField('كلمة المرور', validators=[InputRequired()])
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """
     تسجيل الدخول للمستخدم. يتطلب إدخال اسم المستخدم وكلمة المرور.
     """
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+    form = LoginForm()  # Instantiate the form object
+
+    if request.method == "POST" and form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
 
         conn = get_db()
         cursor = conn.cursor()
@@ -220,7 +237,7 @@ def login():
         else:
             flash("اسم المستخدم أو كلمة المرور غير صحيحة", "danger")
 
-    return render_template("login.html")
+    return render_template("login.html", form=form)
 
 # صفحة التسجيل
 @app.route("/register", methods=["GET", "POST"])
@@ -294,26 +311,50 @@ def dashboard():
     )
 
 # صفحة عرض المستفيدين
-@app.route("/show_beneficiaries")
+@app.route("/show_beneficiaries", methods=["GET", "POST"])
 @login_required
 def show_beneficiaries():
     """
     عرض جميع المستفيدين التابعين للمنظمة المسجّل حسابها.
     """
     orgname = session.get("orgname")
-    conn = get_db()
-    cursor = conn.cursor()
+    
+    # Handle POST request when search button is clicked
+    if request.method == "POST":
+        search_query = request.form.get('search', '').lower()  # Get the search query from the form
 
-    # جلب بيانات المستفيدين
-    cursor.execute("""
-        SELECT name, national_id, contact_number, address, family_members 
-        FROM beneficiaries 
-        WHERE org = ?
-    """, (orgname,))
-    beneficiaries = cursor.fetchall()
-    conn.close()
+        conn = get_db()
+        cursor = conn.cursor()
 
-    return render_template("show_beneficiaries.html", beneficiaries=beneficiaries)
+        # Base query for selecting beneficiaries
+        query = """
+            SELECT name, national_id, contact_number, address, family_members
+            FROM beneficiaries
+            WHERE org = ?
+        """
+        
+        # Add search condition if search query exists
+        params = [orgname]
+        if search_query:
+            query += """
+                AND (LOWER(name) LIKE ? OR LOWER(national_id) LIKE ? OR LOWER(contact_number) LIKE ?)
+            """
+            search_value = f"%{search_query}%"
+            params.extend([search_value, search_value, search_value])
+
+        cursor.execute(query, params)
+        beneficiaries = cursor.fetchall()
+        conn.close()
+
+        if not beneficiaries:
+            # Set notification in the session if no beneficiaries are found
+            session['notification'] = {'type': 'warning', 'message': 'لا يوجد مستفيدين'}
+            return render_template("show_beneficiaries.html", beneficiaries=[])
+
+        return render_template("show_beneficiaries.html", beneficiaries=beneficiaries)
+
+    # If no search, show an empty list or initial state
+    return render_template("show_beneficiaries.html", beneficiaries=[])
 
 # صفحة الموارد الموزّعة على مستفيد معيّن
 @app.route("/beneficiary_resources/<string:national_id>")
@@ -323,23 +364,75 @@ def beneficiary_resources(national_id):
     عرض الموارد الموزعة لمستفيد معيّن حسب رقمه الوطني.
     """
     orgname = session.get("orgname")
+    
+    if not national_id.isdigit() or len(national_id) != 14:
+        return jsonify({"error": "رقم الهوية غير صالح"}), 400
+
+    try:
+        with get_db() as conn:
+            cursor = conn.cursor()
+            query = """
+                SELECT rd.date, re.doner, rd.resource_name, rd.quantity ,rd.org
+                FROM resources_DE rd
+                INNER JOIN resources re ON rd.resource_id = re.id
+                WHERE rd.national_id = ?
+                ORDER BY rd.date DESC
+            """
+            cursor.execute(query, (national_id,))  # Fix: pass national_id as a tuple
+            resources = cursor.fetchall()
+        
+        resources_list = [
+            {
+                "date": resource[0],
+                "doner": resource[1],
+                "resource_name": resource[2],
+                "quantity": resource[3],
+                "org": resource[4],
+            }
+            for resource in resources
+        ]
+        return jsonify({"resources": resources_list})
+    
+    except Exception as e:
+        app.logger.error(f"Error fetching resources for national_id {national_id}: {e}")
+        return jsonify({"error": "حدث خطأ أثناء جلب الموارد."}), 500
+
+
+
+@app.route('/edit_beneficiaryA', methods=['POST'])
+@login_required
+def edit_beneficiaryA():
     conn = get_db()
     cursor = conn.cursor()
 
-    # استعلام لاسترجاع الموارد الموزعة بناءً على national_id
-    cursor.execute("""
-        SELECT rd.date,re.doner,rd.resource_name, rd.quantity 
-        FROM resources_DE rd
-        inner join resources re ON rd.resource_id = re.id
-        WHERE rd.org = ? AND rd.national_id = ? order by rd.date desc
-    """, (orgname, national_id))
-    resources = cursor.fetchall()
-    conn.close()
+    # Ensure the required fields are present
+    required_fields = ['name', 'national_id', 'contact_number', 'address', 'family_members', 'org']
+    for field in required_fields:
+        if not request.form.get(field):
+            return f"Error: Missing required field: {field}", 400  # You can return a more user-friendly error message
 
-    return render_template("beneficiary_resources.html", resources=resources)
+    beneficiary_id = request.form['beneficiary_id']
+    name = request.form['name']
+    national_id = request.form['national_id']
+    contact_number = request.form['contact_number']
+    address = request.form['address']
+    family_members = request.form['family_members']
+    org = request.form['org']
+
+    # Safely update the beneficiary record
+    cursor.execute("""
+        UPDATE beneficiaries
+        SET name = ?, national_id = ?, contact_number = ?, address = ?, family_members = ?, org = ?
+        WHERE id = ?
+    """, (name, national_id, contact_number, address, family_members, org, beneficiary_id))
+
+    conn.commit()
+    return redirect('/search')  # Redirect to the list of beneficiaries after successful update
+
+
 
 # صفحة إضافة مستفيد
-@app.route("/add_beneficiary", methods=["GET", "POST"])
+@app.route("/add_beneficiary", methods=["POST"])
 @login_required
 def add_beneficiary():
     """
@@ -347,30 +440,33 @@ def add_beneficiary():
     """
     orgname = session.get("orgname")
     if not orgname:
-        flash("لا يمكن إضافة مستفيد لأن المنظمة غير محددة.", "danger")
-        return redirect(url_for('login'))
+        session["notification"] = {"type": "error", "message": "لا يمكن إضافة مستفيد لأن المنظمة غير محددة."}
+        return redirect(url_for('show_beneficiaries'))
 
-    if request.method == "POST":
-        name = request.form["beneficiary_name"]
-        national_id = request.form["national_id"]
-        contact_number = request.form["contact_number"]
-        address = request.form["address"]
-        family_members = request.form["family_members"]
+    # Retrieve form data
+    name = request.form.get("beneficiary_name")
+    national_id = request.form.get("national_id")
+    contact_number = request.form.get("contact_number")
+    address = request.form.get("address")
+    family_members = request.form.get("family_members")
 
+    if not all([name, national_id, contact_number, address, family_members]):
+        session["notification"] = {"type": "error", "message": "جميع الحقول مطلوبة."}
+        return redirect(url_for('show_beneficiaries'))
+
+    try:
         conn = get_db()
         cursor = conn.cursor()
 
-        # التحقق من تكرار رقم الهوية
+        # Check for duplicate national ID
         cursor.execute("SELECT org FROM beneficiaries WHERE national_id = ?", (national_id,))
         existing_beneficiary = cursor.fetchone()
 
         if existing_beneficiary:
-            # إشعار المستخدم بوجود المستفيد واسم المنظمة التي يتبع لها
-            flash(f"هذا المستفيد موجود بالفعل في : {existing_beneficiary['org']}", "warning")
-            conn.close()
-            return redirect(url_for('add_beneficiary'))
+            session["notification"] = {"type": "warning", "message": f"هذا المستفيد موجود بالفعل في : {existing_beneficiary['org']}"}
+            return redirect(url_for('show_beneficiaries'))
 
-        # إضافة المستفيد إذا لم يكن موجودًا
+        # Insert new beneficiary
         cursor.execute("""
             INSERT INTO beneficiaries (
                 name, national_id, contact_number, address, family_members, org
@@ -379,12 +475,60 @@ def add_beneficiary():
         """, (name, national_id, contact_number, address, family_members, orgname))
 
         conn.commit()
+        session["notification"] = {"type": "success", "message": "تم إضافة المستفيد بنجاح"}
+    except Exception as e:
+        app.logger.error(f"Error adding beneficiary: {str(e)}")
+        session["notification"] = {"type": "error", "message": "حدث خطأ أثناء إضافة المستفيد."}
+    finally:
         conn.close()
 
-        flash("تم إضافة المستفيد بنجاح", "success")
-        return redirect(url_for('add_beneficiary'))
+    # Clear notification after redirect
+    session.pop("notification", None)
+    return redirect(url_for('show_beneficiaries'))
+@app.route('/edit_beneficiary/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_beneficiary(id):
+    conn = get_db()
+    cursor = conn.cursor()
 
-    return render_template("add_beneficiary.html")
+    # Fetch the beneficiary details from the database by `id`
+    cursor.execute("SELECT * FROM beneficiaries WHERE id = ?", (id,))
+    beneficiary = cursor.fetchone()
+
+    if not beneficiary:
+        return "Beneficiary not found", 404
+
+    if request.method == 'POST':
+        # Retrieve the form data
+        name = request.form['name']
+        contact_number = request.form['contact_number']
+        address = request.form['address']
+        family_members = request.form['family_members']
+
+        # Validate that contact_number is numeric and exactly 11 digits
+        if not contact_number.isdigit() or len(contact_number) != 11:
+            return "رقم الهاتف يجب أن يكون مكون من 11 رقمًا", 400
+
+        # Validate that family_members is a positive integer
+        if not family_members.isdigit() or int(family_members) < 1:
+            return "عدد أفراد الأسرة يجب أن يكون رقماً صحيحاً أكبر من 0", 400
+
+        # Update beneficiary details from the form data
+        cursor.execute("""
+            UPDATE beneficiaries
+            SET name = ?, contact_number = ?, address = ?, family_members = ?
+            WHERE id = ?
+        """, (name, contact_number, address, family_members, id))
+        conn.commit()
+
+        # Redirect to the beneficiaries list page or show a success message
+        flash("تم تعديل المستفيد بنجاح", "success")
+        return redirect(url_for('show_beneficiaries'))
+
+    # Render the form with the existing beneficiary data for editing
+    return render_template('edit_beneficiary_modal.html', beneficiary=beneficiary)
+
+
 # حذف المستفيد
 @app.route('/delete_beneficiary/<string:national_id>', methods=['GET', 'POST'])
 @login_required
@@ -455,6 +599,21 @@ def get_non_beneficiaries():
         }
         for b in beneficiaries
     ])
+@app.route('/clear_notification', methods=['POST'])
+def clear_notification():
+    try:
+        data = request.get_json()  # Try to parse the incoming JSON
+        print('Received data:', data)  # Debugging print
+        if data and data.get('action') == 'clear':  # Ensure 'action' is 'clear'
+            session.pop('notification', None)  # Remove notification from session
+            return jsonify(success=True), 200  # Success response
+        return jsonify(error='Invalid request'), 400  # Handle invalid requests
+    except Exception as e:
+        print('Error:', e)  # Print any errors to the console
+        return jsonify(error=str(e)), 500  # Catch any errors and return a 500 response
+
+
+
 
 # صفحة توزيع الموارد
 @app.route("/resources_distribution", methods=["GET", "POST"])
@@ -466,11 +625,22 @@ def resources_distribution():
     orgname = session.get("orgname")
 
     if request.method == "POST":
-        # بدلاً من استخدام resource_name كاسم المانح، نفصلها لزيادة الوضوح
-        doner_name = request.form["resource_name"]      # اسم المتبرع
-        item_name = request.form["item_name"]           # اسم المورد الفعلي
-        quantity = int(request.form["quantity"].replace(",", ""))
+        # استخراج البيانات من النموذج
+        doner_name = request.form["resource_name"]  # اسم المتبرع
+        item_name = request.form["item_name"]       # اسم المورد الفعلي
+        quantity = request.form["quantity"].replace(",", "")  # إزالة الفواصل
 
+        # التحقق من أن الكمية عدد صحيح
+        try:
+            quantity = int(quantity)
+            if quantity <= 0:
+                flash("يجب إدخال كمية أكبر من 0", "danger")
+                return redirect(url_for('resources_distribution'))
+        except ValueError:
+            flash("الكمية يجب أن تكون عددًا صحيحًا", "danger")
+            return redirect(url_for('resources_distribution'))
+
+        # إدخال البيانات في قاعدة البيانات
         conn = get_db()
         cursor = conn.cursor()
         cursor.execute("""
@@ -483,6 +653,7 @@ def resources_distribution():
         flash("تم إضافة المورد بنجاح", "success")
         return redirect(url_for('resources_distribution'))
 
+    # عرض الموارد المتاحة
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM resources WHERE quantity <> 0 AND org = ?", (orgname,))

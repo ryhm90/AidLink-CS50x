@@ -3,15 +3,24 @@
 {% block title %}عرض المستفيدين{% endblock %}
 
 {% block main %}
-<div class="container my-5">
+<div class="d-flex mb-4 justify-content-between align-items-center">
     <h1 class="mb-4 text-center">بحث مستفيدين</h1>
+
+    <!-- Button to trigger the modal -->
+    <div></div>
+
+    
+    </div>
+<div class="container my-5">
 
     <div class="mb-4">
         <form method="POST" class="d-flex gap-2 align-items-center">
+            <!-- CSRF Token -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input 
                 type="text" 
                 name="search_term" 
-                class="form-control" 
+                style="height: 38px; padding-top: 8px; padding-bottom: 8px; margin-top: 20px;margin-left: 10px; width:300px;"
                 placeholder="بحث حسب الاسم أو رقم الهوية" 
                 required>
             <button type="submit" class="btn btn-info btn-sm">بحث</button>
@@ -28,6 +37,7 @@
                     <th>العنوان</th>
                     <th>عدد أفراد الأسرة</th>
                     <th>المنظمة</th>
+                    <th>الإجراءات</th> <!-- Added for Edit Button -->
                 </tr>
             </thead>
             <tbody>
@@ -39,10 +49,91 @@
                         <td>{{ beneficiary.address }}</td>
                         <td>{{ beneficiary.family_members }}</td>
                         <td>{{ beneficiary.org }}</td>
+                        <td>
+                            <!-- Edit Button -->
+
+<a href="#" class="text-warning" data-bs-toggle="modal" data-bs-target="#editBeneficiaryModal"         onclick="populateEditForm('{{ beneficiary.id }}', '{{ beneficiary.name }}', '{{ beneficiary.national_id }}', '{{ beneficiary.contact_number }}', '{{ beneficiary.address }}', '{{ beneficiary.family_members }}', '{{ beneficiary.org }}')">
+    <i class="bi bi-pencil fs-4"></i>
+</a>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<!-- Edit Beneficiary Modal -->
+<div class="modal fade" id="editBeneficiaryModal" tabindex="-1" aria-labelledby="editBeneficiaryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header position-relative">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق" style="position: absolute; left: 10px; top: 20px;"></button>
+<h5 class="modal-title" id="editBeneficiaryModalLabel">تعديل بيانات المستفيد</h5>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="/edit_beneficiaryA">
+                    <!-- CSRF Token -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="beneficiary_id" id="beneficiary_id">
+                    
+                    <!-- Form Fields for Editing Beneficiary -->
+                    <div class="mb-3">
+                        <label for="edit_name" class="form-label">الاسم</label>
+                        <input type="text" class="form-control" id="edit_name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_national_id" class="form-label">رقم الهوية الوطنية</label>
+                        <input type="text" class="form-control" id="edit_national_id" name="national_id" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_contact_number" class="form-label">رقم الاتصال</label>
+                        <input type="text" class="form-control" id="edit_contact_number" name="contact_number" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_address" class="form-label">العنوان</label>
+                        <input type="text" class="form-control" id="edit_address" name="address" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_family_members" class="form-label">عدد أفراد الأسرة</label>
+                        <input type="number" class="form-control" id="edit_family_members" name="family_members" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_org" class="form-label">المنظمة</label>
+                        <select class="form-control" id="edit_org" name="org" required>
+                            <option disabled value="">اختر المنظمة</option>
+                            {% for org in organizations %}
+                                <option value="{{ org }}">{{ org }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                
+                    <button type="submit" class="btn btn-primary">تحديث</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Function to populate the edit form with existing beneficiary data
+    function populateEditForm(id, name, nationalId, contactNumber, address, familyMembers, org) {
+        document.getElementById('beneficiary_id').value = id;
+        document.getElementById('edit_name').value = name;
+        document.getElementById('edit_national_id').value = nationalId;
+        document.getElementById('edit_contact_number').value = contactNumber;
+        document.getElementById('edit_address').value = address;
+        document.getElementById('edit_family_members').value = familyMembers;
+        
+        // Set the organization dropdown value
+        let orgDropdown = document.getElementById('edit_org');
+        for (let option of orgDropdown.options) {
+            if (option.value === org) {
+                option.selected = true;
+                break;
+            }
+        }
+    }
+</script>
 {% endblock %}
+
+

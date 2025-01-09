@@ -4,14 +4,25 @@
 
 {% block main %}
 <h1>تسجيل الدخول</h1>
+
+<!-- Display flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="alert alert-{{ messages[0][0] }}">
+            {{ messages[0][1] }}
+        </div>
+    {% endif %}
+{% endwith %}
+
 <form action="/login" method="POST">
+    {{ form.hidden_tag() }}  <!-- This will include the CSRF token -->
     <div class="mb-3">
         <label for="username" class="form-label">اسم المستخدم</label>
-        <input type="text" class="form-control" id="username" name="username" required>
+        {{ form.username(class="form-control", id="username") }}
     </div>
     <div class="mb-3">
         <label for="password" class="form-label">كلمة المرور</label>
-        <input type="password" class="form-control" id="password" name="password" required>
+        {{ form.password(class="form-control", id="password") }}
     </div>
     <button type="submit" class="btn btn-primary">تسجيل الدخول</button>
 </form>
