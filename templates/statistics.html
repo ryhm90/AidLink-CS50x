@@ -1,12 +1,41 @@
 {% extends "layout.html" %}
 
 {% block title %}إحصائيات المنظمة{% endblock %}
-
+<style>
+    .card {
+        background-image: url('{{ url_for('static', filename='Charity.png') }}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        color: white; /* Adjust text color for visibility */
+    }
+    
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+        z-index: 0;
+    }
+    
+    .card > * {
+        position: relative;
+        z-index: 1;
+    }
+</style>
 
 {% block main %}
 <div class="container">
-    <h1 class="text-center my-5">إحصائيات المنظمة</h1>
-
+    <div class="d-flex mb-4 justify-content-between align-items-center">
+        <h1 class="text-center my-5">إحصائيات المنظمة</h1>
+    
+        <!-- Button to trigger the modal -->
+        <div></div>
+    
+        
+        </div>
     <div class="row">
         <!-- Number of Beneficiaries -->
         <div class="col-md-4">
