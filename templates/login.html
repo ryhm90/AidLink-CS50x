@@ -1,29 +1,94 @@
 {% extends "layout.html" %}
 
 {% block title %}تسجيل الدخول{% endblock %}
+<style>
+    .login-card {
+        background-image: url('{{ url_for('static', filename='Charity.png') }}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        color: white; /* Adjust text color for visibility */
+    }
+    
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+        z-index: 0;
+    }
+    
+    .login-card > * {
+        position: relative;
+        z-index: 1;
+    }
 
+    /* Align button with textboxes */
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .btn-lg {
+        width: 100%; /* Make button as wide as inputs */
+    }
+
+    /* Center the inner card within the left column */
+    .login-left {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 10%;
+    }
+
+    /* Inner card styling */
+    .inner-login-card {
+        width: 100%; /* or set a specific width if needed */
+        background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white for visibility */
+        padding: 20px;
+        border-radius: 10px;
+    }
+    
+</style>
 {% block main %}
-<h1>تسجيل الدخول</h1>
-
-<!-- Display flash messages -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <div class="alert alert-{{ messages[0][0] }}">
-            {{ messages[0][1] }}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg p-3 mb-5 bg-white rounded login-card">
+                <div class="row g-0">
+                    <div class="col-md-6 d-flex justify-content-center align-items-center">
+                        <div class="inner-login-card">
+                            <h1 class="text-center mb-4">تسجيل الدخول</h1>
+                            <form action="/login" method="POST" class="login-form">
+                                {{ form.hidden_tag() }} <!-- CSRF token -->
+                                <div class="form-group">
+                                    <label for="username" class="form-label">اسم المستخدم</label>
+                                    {{ form.username(class="form-control", id="username") }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="password" class="form-label">كلمة المرور</label>
+                                    {{ form.password(class="form-control", id="password") }}
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary btn-lg">تسجيل الدخول</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Since you're using the background image, this div might not be necessary -->
+                    <div class="col-md-6 d-flex align-items-stretch">
+                        <img 
+                            src="{{ url_for('static', filename='charity.png') }}" 
+                            class="img-fluid rounded-end" 
+                            alt="Charity Photo" 
+                            style="height: 100%; width: auto; object-fit: cover;"
+                        >
+                    </div>
+                                </div>
+            </div>
         </div>
-    {% endif %}
-{% endwith %}
-
-<form action="/login" method="POST">
-    {{ form.hidden_tag() }}  <!-- This will include the CSRF token -->
-    <div class="mb-3">
-        <label for="username" class="form-label">اسم المستخدم</label>
-        {{ form.username(class="form-control", id="username") }}
     </div>
-    <div class="mb-3">
-        <label for="password" class="form-label">كلمة المرور</label>
-        {{ form.password(class="form-control", id="password") }}
-    </div>
-    <button type="submit" class="btn btn-primary">تسجيل الدخول</button>
-</form>
+</div>
 {% endblock %}

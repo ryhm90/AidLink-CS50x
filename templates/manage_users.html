@@ -1,6 +1,32 @@
 {% extends "layout.html" %}
 {% block title %}إدارة المستخدمين{% endblock %}
+<style>
+    .card {
+        background-image: url('{{ url_for('static', filename='Charity.png') }}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        color: white; /* Adjust text color for visibility */
+    }
+    
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+        z-index: 0;
+    }
+    
+    .card > * {
+        position: relative;
+        z-index: 1;
+    }
+</style>
 {% block main %}
+<div class="card shadow-lg p-3 mb-5 bg-white rounded card">
+
 <div class="d-flex mb-4 justify-content-between align-items-center">
     <h2>إدارة المستخدمين</h2>
 
@@ -56,5 +82,5 @@
         </table>
     </div>
 </div>
-
+</div>
 {% endblock %}

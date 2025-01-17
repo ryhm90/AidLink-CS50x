@@ -10,11 +10,14 @@ from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, PasswordField
 from wtforms.validators import InputRequired
 from flask_wtf import FlaskForm
+from flask_assets import Environment, Bundle
 
 # ----------------------------------------------------------------
 #  تكوين التطبيق
 # ----------------------------------------------------------------
 app = Flask(__name__)
+assets = Environment(app)
+
 app.secret_key = 'your_secret_key_here'  # استخدم مفتاحًا سريًا حقيقيًا في الإنتاج
 csrf = CSRFProtect(app)
 # ----------------------------------------------------------------
@@ -492,7 +495,7 @@ def edit_beneficiary(id):
     cursor = conn.cursor()
 
     # Fetch the beneficiary details from the database by `id`
-    cursor.execute("SELECT * FROM beneficiaries WHERE id = ?", (id,))
+    cursor.execute("SELECT * FROM beneficiaries WHERE national_id = ?", (id,))
     beneficiary = cursor.fetchone()
 
     if not beneficiary:
@@ -500,7 +503,7 @@ def edit_beneficiary(id):
 
     if request.method == 'POST':
         # Retrieve the form data
-        name = request.form['name']
+        name = request.form['beneficiary_name']
         contact_number = request.form['contact_number']
         address = request.form['address']
         family_members = request.form['family_members']
@@ -517,7 +520,7 @@ def edit_beneficiary(id):
         cursor.execute("""
             UPDATE beneficiaries
             SET name = ?, contact_number = ?, address = ?, family_members = ?
-            WHERE id = ?
+            WHERE national_id = ?
         """, (name, contact_number, address, family_members, id))
         conn.commit()
 
@@ -791,8 +794,18 @@ def comma_filter(value):
     except (ValueError, TypeError):
         return value
 
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
+# Register a custom filter for formatting numbers with commas
+@app.template_filter('format_number')
+def format_number(value):
+    try:
+        return locale.format_string("%d", value, grouping=True)
+    except (TypeError, ValueError):
+        return value  # Return the original value if formatting fails
 
+styles = Bundle('static/styles.css', filters='jinja2', output='static/styles.css')
+assets.register('styles', styles)
 
 # صفحة تسجيل الخروج
 @app.route("/logout")

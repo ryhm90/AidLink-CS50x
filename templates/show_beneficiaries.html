@@ -1,8 +1,32 @@
 {% extends "layout.html" %}
 
 {% block title %}إدارة المستفيدين{% endblock %}
-
+<style>
+    .card {
+        background-image: url('{{ url_for('static', filename='Charity.png') }}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        color: white; /* Adjust text color for visibility */
+    }
+    
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+        z-index: 0;
+    }
+    
+    .card > * {
+        position: relative;
+        z-index: 1;
+    }
+</style>
 {% block main %}
+<div class="card shadow-lg p-3 mb-5 bg-white rounded card">
 <div class="d-flex mb-4 justify-content-between align-items-center">
     <h1 class="mb-4">إدارة المستفيدين</h1>
 
@@ -18,7 +42,7 @@
         <!-- Add New Beneficiary Button on the left -->
          <!-- Search Box and Search Icon on the right -->
         <div class="d-flex align-items-center">
-            <input type="text" id="searchInput" class="form-control me-2" name="search" placeholder="بحث بالاسم، رقم الهوية، أو رقم التواصل" style="height: 38px; padding-top: 8px; padding-bottom: 8px; margin-top: 20px;margin-left: 10px; width:300px;">
+            <input type="text" id="searchInput" class="form-control me-2" name="search" placeholder="بحث بالاسم، رقم الهوية، أو رقم التواصل" style="height: 38px; padding-top: 8px; padding-bottom: 8px; margin-top: 20px;margin-left: 10px; width:200px;">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> <!-- CSRF Token -->
             <button type="submit" class="btn btn-primary" style="height: 38px; display: flex; align-items: center;">
                 بحث <i class="bi bi-search" style="margin-right: 5px;"></i> 
@@ -237,6 +261,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
