@@ -11,6 +11,8 @@ from wtforms import StringField, PasswordField
 from wtforms.validators import InputRequired
 from flask_wtf import FlaskForm
 from flask_assets import Environment, Bundle
+from waitress import serve
+
 
 # ----------------------------------------------------------------
 #  تكوين التطبيق
