@@ -9,11 +9,51 @@ nav .navbar-brand {
     align-items: center;
     justify-content: center;
 }
-
+.centered-input {
+    width: 250px; /* Or any fixed width you prefer */
+    margin: 0 auto 20px auto; /* Center horizontally and keep bottom margin */
+    text-align: center; /* Center the typed text */
+}
 nav .navbar-brand .blue {
     color: #D1BEB0; /* Orange for vibrant accent */
 }
+body.dark-mode {
+  background-color: #121212;
+  color: #e0e0e0;
+}
 
+body.dark-mode .navbar,
+body.dark-mode .offcanvas,
+body.dark-mode .alert {
+  background-color: #1f1f1f !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .nav-link {
+  color: #ddd;
+}
+
+body.dark-mode .nav-link:hover {
+  background-color: #2a2a2a;
+}
+
+@media (max-width: 767px) {
+    .navbar .nav-item .dropdown-toggle {
+        border: none;
+        background: none;
+    }
+
+    .navbar .nav-item .dropdown-menu {
+        background: none;
+        left: 0;
+        right: auto;
+        border: none;
+
+    }
+}
+.dropdown-menu {
+    text-align: right;
+}
 nav .navbar-brand .red {
     color: #660000; /* Dark Red for emphasis */
 }
@@ -60,30 +100,45 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 20px;
 }
 
-/* الجدول */
-.table {
+/* ✅ غلاف الجدول للتمرير */
+.table-wrapper {
+    max-height: 400px; /* ارتفاع الجدول قبل التمرير */
+    overflow-y: auto;
+    overflow-x: auto;
     width: 90%;
     margin: 20px auto;
-    background-color: #383F51; /* White background */
-    color: #000000; /* Black text for readability */
+}
+
+/* ✅ تنسيق الجدول الأساسي */
+.table {
+    width: 100%;
+    background-color: #fff; /* خلفية بيضاء للصفوف */
+    color: #000000;
     border-radius: 10px;
     overflow: hidden;
     border-collapse: collapse;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* ✅ رأس الجدول */
 .table th {
-    background-color: #383F51; /* Vibrant Orange */
-    color: #FFFFFC; /* White text for contrast */
+    background-color: #383F51;
+    color: #FFFFFC;
     font-weight: bold;
+    position: sticky;   /* يجعل الرأس يثبت أثناء التمرير */
+    top: 0;
+    z-index: 10;
+    border-bottom: 2px solid #dee2e6;
 }
 
+/* ✅ الصفوف المتناوبة */
 .table tbody tr:nth-child(even) {
-    background-color: #BEB7A4; /* Muted Beige for alternating rows */
+    background-color: #BEB7A4;
 }
 
+/* ✅ تأثير تمرير */
 .table tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.05); /* Subtle highlight */
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 /* الحقول */
@@ -201,5 +256,22 @@ label {
     align-items: center;
 }
 
+
+/* Token label and display */
+.token-display {
+    margin-top: 20px;
+    margin-bottom: 20px;
+
+    font-size: 20px; /* Increased font size */
+    font-weight: 700; /* Bold token text */
+    color: #007bff;
+    background-color: #f8f9fa;
+    padding: 20px 15px; /* Increased padding for top and bottom */
+    border: 2px dashed #007bff;
+    border-radius: 8px;
+    word-wrap: break-word;
+    line-height: 1.5;
+    text-align: center;
+}
 
 

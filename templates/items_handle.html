@@ -1,0 +1,86 @@
+{% extends "layout.html" %}
+{% block title %}تسليم معدات الوقاية الشخصية{% endblock %}
+{% block main %}
+<script>
+  var csrfToken = "{{ csrf_token() }}";
+</script>
+<!-- ✅ Toasts -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+  <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body">✅ تمت العملية بنجاح</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+
+  <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert">
+    <div class="d-flex">
+      <div id="errorToastMessage" class="toast-body">❌ حدث خطأ أثناء العملية</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+<h4 class="mb-3">تسليم معدات الوقاية الشخصية</h4>
+<form method="POST" id="itemsForm" class="row g-2 mb-4" onsubmit="event.preventDefault(); searchitems();">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="col-auto">
+    <input type="text" name="nono" id="nonoInput" class="form-control" placeholder="رقم الموظف" required>
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary">🔍 بحث</button>
+  </div>
+</form>
+
+<div id="items_handle-section">{% include 'partials/items_handle_section.html' %}</div>
+
+<script>
+  async function searchitems() {
+    const formData = new FormData(document.getElementById('itemsForm'));
+    const response = await fetch('/items_handle', {
+      method: 'POST',
+      body: formData
+    });
+    const html = await response.text();
+    document.getElementById('items_handle-section').innerHTML = html;
+
+  }
+
+  async function saveitems() {
+    const form = document.getElementById("additemsForm");
+    const formData = new FormData(form);
+    const res = await fetch("/items_handle/save", {
+      method: "POST",
+      body: formData,
+    });
+    const html = await res.text();
+    document.getElementById("items_handle-section").innerHTML = html;
+    const modal = bootstrap.Modal.getInstance(document.getElementById('additemsModal'));
+    if (modal) modal.hide();
+    document.body.classList.remove('modal-open');
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    new bootstrap.Toast(document.getElementById("successToast")).show();
+
+  }
+
+  
+  async function deleteitems(id) {
+    const form = document.getElementById("deleteitemsForm");
+    const formData = new FormData(form);
+
+  const res = await fetch("/items_handle/delete", {
+    method: "POST",
+    body: formData,
+  });
+
+  const html = await res.text();
+  document.getElementById("items_handle-section").innerHTML = html;
+
+  const modal = bootstrap.Modal.getInstance(document.getElementById(`deleteitemsModal_${id}`));
+  if (modal) modal.hide();
+  document.body.classList.remove('modal-open');
+  document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+  new bootstrap.Toast(document.getElementById("successToast")).show();
+}
+
+</script>
+{% endblock %}

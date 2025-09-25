@@ -1,0 +1,203 @@
+{% extends "layout.html" %}
+
+{% block title %}تقرير{% endblock %}
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mui/x-date-pickers/dist/index.css">
+
+<style>
+    .card {
+        color: white; /* Adjust text color for visibility */
+        position: relative;
+    }
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+        z-index: 0;
+    }
+
+    .card > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+</style>
+
+{% block main %}
+<div class="card shadow-lg p-3 mb-5 bg-white rounded">
+
+    <h1 class="text-center">توليد التقرير</h1>
+
+    <!-- Report Selection Form -->
+    <form action="/generate_report" method="get" class="mb-4" id="reportForm">
+        <div class="row">
+            <div class="col-md-4">
+                <label for="report_type" class="form-label">نوع التقرير</label>
+                <select id="report_type" name="report_type" class="form-select" required>
+                    <option value="beneficiaries_report">تقرير المستفيدين</option>
+                    <option value="resource_distribution_report">تقرير توزيع الموارد</option>
+                    <option value="resource_inventory_report">تقرير المخزون</option>
+                    <option value="resource_donor_report">تقرير المانحين</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="start_date" class="form-label">من</label>
+                <input type="date" id="start_date" name="start_date" class="form-control" placeholder="اختر تاريخ البداية">
+            </div>
+            <div class="col-md-4">
+                <label for="end_date" class="form-label">إلى</label>
+                <input type="date" id="end_date" name="end_date" class="form-control" placeholder="اختر تاريخ النهاية">
+            </div>
+            <div class="col-md-4 mt-3">
+                <label for="submit" class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-primary form-control" id="submitBtn" disabled>توليد التقرير</button>
+            </div>
+
+            <div class="col-md-4 mt-3">
+                <label for="reset" class="form-label">&nbsp;</label>
+                <button type="button" class="btn btn-secondary form-control" id="resetBtn">إعادة تعيين</button>
+            </div>
+            <div class="col-md-4 mt-3">
+                <label for="exportLink" class="form-label">&nbsp;</label>
+                <a id="exportLink" href="#" class="btn btn-secondary form-control">
+                    تحميل تقرير PDF
+                </a>            </div>
+        </div>
+     
+    </form>
+
+    <!-- Display Report Data -->
+    {% if report_data %}
+    <h2 class="text-center mb-4">نتائج التقرير: {{ report_type_ar }}</h2>
+    <div class="table-wrapper">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    {% if report_type == 'beneficiaries_report' %}
+                    <th>اسم المستفيد</th>
+                    <th>رقم الهوية الوطنية</th>
+                    <th>الانظمام</th>
+                    <th>رقم الاتصال</th>
+                    <th>العنوان</th>
+                    <th>أفراد العائلة</th>
+                    {% elif report_type == 'resource_distribution_report' %}
+                    <th>اسم المستفيد</th>
+                    <th>اسم المورد</th>
+                    <th>الكمية</th>
+                    <th>التاريخ</th>
+                    {% elif report_type == 'resource_inventory_report' %}
+                    <th>اسم المورد</th>
+                    <th>الكمية</th>
+                    <th>التاريخ</th>
+                    {% elif report_type == 'resource_donor_report' %}
+                    <th>اسم المتبرع</th>
+                    <th>اسم المورد</th>
+                    <th>الكمية</th>
+                    <th>التاريخ</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in report_data %}
+                <tr>
+                    {% if report_type == 'beneficiaries_report' %}
+                    <td>{{ row['name'] }}</td>
+                    <td>{{ row['national_id'] }}</td>
+                    <td>{{ row['created_at'] }}</td>
+                    <td>{{ row['contact_number'] }}</td>
+                    <td>{{ row['address'] }}</td>
+                    <td>{{ row['family_members'] }}</td>
+                    {% elif report_type == 'resource_distribution_report' %}
+                    <td>{{ row['name'] }}</td>
+                    <td>{{ row['resource_name'] }}</td>
+                    <td>{{ row['quantity'] | format_number }}</td>
+                    <td>{{ row['date'] }}</td>
+                    {% elif report_type == 'resource_inventory_report' %}
+                    <td>{{ row['resource_name'] }}</td>
+                    <td>{{ row['quantity'] | format_number }}</td>
+                    <td>{{ row['created_at'] }}</td>
+                    {% elif report_type == 'resource_donor_report' %}
+                    <td>{{ row['doner'] }}</td>
+                    <td>{{ row['resource_name'] }}</td>
+                    <td>{{ row['quantity'] | format_number }}</td>
+                    <td>{{ row['created_at'] }}</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-center">لا توجد بيانات لعرضها</p>
+    {% endif %}
+</div>
+
+<script>
+    // التحقق من صحة النطاق وتفعيل/تعطيل زر الإرسال
+    function validateDateRange() {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        const submitBtn = document.getElementById('submitBtn');
+        
+        if ((startDate && endDate) || (!startDate && endDate) || (startDate && !endDate)) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+
+            if (startDate && endDate && start <= end) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        } else {
+            submitBtn.disabled = false; // Enable if no date selected
+        }
+    }
+
+    // التحقق الأولي
+    validateDateRange();
+
+    // إضافة الحدث للتواريخ
+    document.getElementById('start_date').addEventListener('change', validateDateRange);
+    document.getElementById('end_date').addEventListener('change', validateDateRange);
+
+    // إعادة تعيين التواريخ
+    document.getElementById('resetBtn').addEventListener('click', function() {
+        document.getElementById('start_date').value = '';
+        document.getElementById('end_date').value = '';
+        validateDateRange();
+    });
+
+    // Function to update the export link based on selected dates
+    function updateExportLink() {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        const exportLink = document.getElementById('exportLink');
+        const reportType = document.getElementById('report_type').value;
+
+        // Check if both start_date and end_date are provided
+        if (startDate && endDate) {
+            exportLink.href = "/export_pdf?report_type=" + reportType + "&startDate=" + startDate + "&endDate=" + endDate;
+            } else {
+            exportLink.href = "#"; // Disable the link if dates are not selected
+        }
+    }
+
+    // Add event listeners to update the export link when dates change
+    document.getElementById('start_date').addEventListener('change', updateExportLink);
+    document.getElementById('end_date').addEventListener('change', updateExportLink);
+
+    // Initialize the export link on page load
+    updateExportLink();
+</script>
+
+{% endblock %}

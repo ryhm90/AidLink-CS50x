@@ -1,14 +1,8 @@
 {% extends "layout.html" %}
 
 {% block title %}تسجيل الدخول{% endblock %}
+
 <style>
-    .login-card {
-        background-image: url('{{ url_for('static', filename='Charity.png') }}');
-        background-size: cover;
-        background-repeat: no-repeat;
-        color: white; /* Adjust text color for visibility */
-    }
-    
     .login-card::before {
         content: '';
         position: absolute;
@@ -16,25 +10,23 @@
         right: 0;
         bottom: 0;
         left: 0;
-        background: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+        background: rgba(0, 0, 0, 0.5);
         z-index: 0;
     }
-    
+
     .login-card > * {
         position: relative;
         z-index: 1;
     }
 
-    /* Align button with textboxes */
     .form-group {
         margin-bottom: 1rem;
     }
-    
+
     .btn-lg {
-        width: 100%; /* Make button as wide as inputs */
+        width: 100%;
     }
 
-    /* Center the inner card within the left column */
     .login-left {
         display: flex;
         justify-content: center;
@@ -42,51 +34,74 @@
         height: 10%;
     }
 
-    /* Inner card styling */
     .inner-login-card {
-        width: 100%; /* or set a specific width if needed */
-        background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white for visibility */
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.85);
         padding: 20px;
         border-radius: 10px;
+        color: #000;
     }
-    
+
+    /* الوضع الليلي */
+    [data-theme="dark"] .inner-login-card {
+        background-color: rgba(30, 30, 30, 0.9);
+        color: #f1f1f1;
+    }
+
+    [data-theme="dark"] .inner-login-card input,
+    [data-theme="dark"] .inner-login-card label {
+        color: #f1f1f1;
+    }
+
+    [data-theme="dark"] .inner-login-card .form-control {
+        background-color: #2a2a2a;
+        border-color: #555;
+        color: #fff;
+    }
+
+    /* زر الطفو (في حال أردت استخدامه لاحقاً) */
+    .fab {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #007bff;
+        color: white;
+        border-radius: 50%;
+        padding: 15px;
+        font-size: 24px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    #decryptionField {
+        display: none;
+    }
 </style>
+
 {% block main %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg p-3 mb-5 bg-white rounded login-card">
-                <div class="row g-0">
-                    <div class="col-md-6 d-flex justify-content-center align-items-center">
-                        <div class="inner-login-card">
-                            <h1 class="text-center mb-4">تسجيل الدخول</h1>
-                            <form action="/login" method="POST" class="login-form">
-                                {{ form.hidden_tag() }} <!-- CSRF token -->
-                                <div class="form-group">
-                                    <label for="username" class="form-label">اسم المستخدم</label>
-                                    {{ form.username(class="form-control", id="username") }}
-                                </div>
-                                <div class="form-group">
-                                    <label for="password" class="form-label">كلمة المرور</label>
-                                    {{ form.password(class="form-control", id="password") }}
-                                </div>
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-primary btn-lg">تسجيل الدخول</button>
-                                </div>
-                            </form>
-                        </div>
+        <div class="card shadow-lg p-5 mb-5 bg-white rounded login-card col-md-5">
+            <div class="inner-login-card">
+                <h1 class="text-center mb-4">تسجيل الدخول</h1>
+                <form action="/login" method="POST" class="login-form">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-group text-center">
+                        <label for="user_name" class="form-label">اسم المستخدم</label>
+                        {{ form.user_name(class="form-control centered-input", id="user_name") }}
                     </div>
-                    
-                    <!-- Since you're using the background image, this div might not be necessary -->
-                    <div class="col-md-6 d-flex align-items-stretch">
-                        <img 
-                            src="{{ url_for('static', filename='charity.png') }}" 
-                            class="img-fluid rounded-end" 
-                            alt="Charity Photo" 
-                            style="height: 100%; width: auto; object-fit: cover;"
-                        >
+                    <div class="form-group text-center">
+                        <label for="password" class="form-label">كلمة المرور</label>
+                        {{ form.password(class="form-control centered-input", id="password") }}
                     </div>
-                                </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-lg">تسجيل الدخول</button>
+                    </div>
+
+                </form>
             </div>
         </div>
     </div>

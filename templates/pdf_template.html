@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تقرير PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            text-align: right;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>تقرير {{ report_type }}</h1>
+    <table>
+        <thead>
+            <tr>
+                {% if report_type == 'beneficiaries_report' %}
+                <th>اسم المستفيد</th>
+                <th>رقم الهوية الوطنية</th>
+                <th>رقم الاتصال</th>
+                <th>العنوان</th>
+                <th>أفراد العائلة</th>
+                <th>تاريخ الانضمام</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in report_data %}
+            <tr>
+                {% if report_type == 'beneficiaries_report' %}
+                <td>{{ row['name'] }}</td>
+                <td>{{ row['national_id'] }}</td>
+                <td>{{ row['contact_number'] }}</td>
+                <td>{{ row['address'] }}</td>
+                <td>{{ row['family_members'] }}</td>
+                <td>{{ row['created_at'] }}</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,127 @@
+{% if emp %}
+<div class="card mb-4 shadow">
+  <div class="card-body">
+    <h5 class="card-title">معلومات الموظف</h5>
+    <p><strong>رقم الجهة:</strong> {{ emp.nono }}</p>
+    <p><strong>الاسم:</strong> {{ emp.name }}</p>
+    <p><strong>النوع:</strong> {{ emp.six_type }} - {{ emp.mared }}</p>
+    <p><strong>الوظيفة:</strong> {{ emp.type_work }}</p>
+    <p><strong>العنوان:</strong> {{ emp.addres }}</p>
+    <p><strong>الموقع:</strong> {{ emp.locat_na }}</p>
+
+    <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#addHelpModal">
+      ➕ إضافة منحة جديدة
+    </button>
+  </div>
+</div>
+{% endif %}
+
+{% if helps %}
+<div class="table-responsive">
+  <table class="table table-bordered text-center table-hover small">
+    <thead class="table-light">
+      <tr>
+        <th>التاريخ</th>
+        <th>تاريخ الجلسة</th>
+        <th>المبلغ</th>
+        <th>عدد المنح</th>
+        <th>تفاصيل</th>
+        <th>إجراءات</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for h in helps %}
+      <tr>
+        <td>{{ h.date1 }}</td>
+        <td>{{ h.date2 }}</td>
+        <td>{{ h.pay }}</td>
+        <td>{{ h.no_pay }}</td>
+        <td>{{ h.detail or "-" }}</td>
+        <td>
+          <a href="#" class="text-warning me-2" data-bs-toggle="modal" data-bs-target="#editHelpModal_{{ h.id }}">
+            <i class="bi bi-pencil-square fs-5"></i>
+          </a>
+          <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteHelpModal_{{ h.id }}">
+            <i class="bi bi-trash fs-5"></i>
+          </a>
+        </td>
+      </tr>
+
+      <!-- Modal التعديل -->
+      <div class="modal fade" id="editHelpModal_{{ h.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <form class="modal-content" onsubmit="event.preventDefault(); updateHelp('{{ h.id }}');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="modal-header bg-warning text-white">
+              <h5 class="modal-title">✏️ تعديل منحة</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <input type="hidden" name="id" value="{{ h.id }}">
+              <input type="date" name="date1" class="form-control mb-2" value="{{ h.date1 }}" required>
+              <input type="date" name="date2" class="form-control mb-2" value="{{ h.date2 }}" required>
+              <input type="number" name="pay" class="form-control mb-2" value="{{ h.pay }}" required>
+              <input type="number" name="no_pay" class="form-control mb-2" value="{{ h.no_pay }}">
+              <textarea name="detail" class="form-control mb-2">{{ h.detail }}</textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-warning">تحديث</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal الحذف -->
+      <div class="modal fade" id="deleteHelpModal_{{ h.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <form class="modal-content" onsubmit="event.preventDefault(); deleteHelp('{{ h.id }}');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ h.id }}">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title">🗑 تأكيد الحذف</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              هل أنت متأكد من حذف هذه المنحة بتاريخ <strong>{{ h.date1 }}</strong>؟
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-danger">نعم، حذف</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- Modal الإضافة -->
+<div class="modal fade" id="addHelpModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="modal-content" id="addHelpForm" onsubmit="event.preventDefault(); saveHelp();">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">➕ إضافة منحة جديدة</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="nono" value="{{ emp.nono }}">
+        <input type="hidden" name="name" value="{{ emp.name }}">
+        <input type="date" name="date1" class="form-control mb-2" required>
+        <input type="date" name="date2" class="form-control mb-2" required>
+        <input type="number" name="pay" class="form-control mb-2" placeholder="مبلغ المنحة" required>
+        <input type="number" name="no_pay" class="form-control mb-2" placeholder="عدد المنح">
+        <textarea name="detail" class="form-control mb-2" placeholder="تفاصيل إضافية"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">إضافة</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+{% block title %}فحص طبي للموظف{% endblock %}
+{% block main %}
+<script>
+async function saveCheckup() {
+    const form = document.getElementById("checkup-form");
+    const firstDate = new Date(form.first_date.value);
+    const returnDate = new Date(form.return_date.value);
+
+    if (form.return_date.value && returnDate <= firstDate) {
+        alert("❌ تاريخ الإعادة يجب أن يكون بعد تاريخ الفحص الأولي");
+        return;
+    }
+
+    const formData = new FormData(form);
+    try {
+        const res = await fetch("/checkup/save", {
+            method: "POST",
+            body: formData
+        });
+        const html = await res.text();
+        document.getElementById("checkup-section").innerHTML = html;
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('newCheckupModal'));
+        if (modal) modal.hide();
+        document.body.classList.remove('modal-open');
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+
+        new bootstrap.Toast(document.getElementById("successToast")).show();
+    } catch (err) {
+        document.getElementById("errorToastMessage").innerText = "❌ حدث خطأ أثناء الحفظ";
+        new bootstrap.Toast(document.getElementById("errorToast")).show();
+    }
+}
+
+async function deleteCheckup(formId) {
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+
+    try {
+        const res = await fetch("/checkup/delete", {
+            method: "POST",
+            body: formData
+        });
+        const html = await res.text();
+        document.getElementById("checkup-section").innerHTML = html;
+        const modal = bootstrap.Modal.getInstance(document.getElementById(formId));
+        if (modal) modal.hide();
+        document.body.classList.remove('modal-open');
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+
+        new bootstrap.Toast(document.getElementById("successToastDelete")).show();
+    } catch (err) {
+        document.getElementById("errorToastMessage").innerText = "❌ حدث خطأ أثناء الحذف";
+        new bootstrap.Toast(document.getElementById("errorToast")).show();
+    }
+}
+
+async function updateCheckup(formId) {
+    const form = document.getElementById(formId);
+    const firstDate = new Date(form.first_date.value);
+    const returnDate = new Date(form.return_date.value);
+
+    if (form.return_date.value && returnDate <= firstDate) {
+        alert("❌ تاريخ الإعادة يجب أن يكون بعد تاريخ الفحص الأولي");
+        return;
+    }
+
+    const formData = new FormData(form);
+    try {
+        const res = await fetch("/checkup/update", {
+            method: "POST",
+            body: formData
+        });
+        const html = await res.text();
+        document.getElementById("checkup-section").innerHTML = html;
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById(formId));
+        if (modal) modal.hide();
+        document.body.classList.remove('modal-open');
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+
+        new bootstrap.Toast(document.getElementById("successToastUpdate")).show();
+    } catch (err) {
+        document.getElementById("errorToastMessage").innerText = "❌ حدث خطأ أثناء التعديل";
+        new bootstrap.Toast(document.getElementById("errorToast")).show();
+    }
+}
+async function searchchekup() {
+  const formData = new FormData(document.getElementById('searchForm'));
+  const response = await fetch('/checkup', {
+    method: 'POST',
+    body: formData
+  });
+  const html = await response.text();
+  document.getElementById('checkup-section').innerHTML = html;
+}
+
+</script>
+
+<h4 class="mb-3">الفحوصات الطبية</h4>
+<form method="POST" id="searchForm" class="row g-2 mb-4" onsubmit="event.preventDefault(); searchchekup();">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="col-auto">
+    <input type="text" name="nono" class="form-control" placeholder="رقم الموظف" value="{{ nono or '' }}" required>
+</div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary">🔍 بحث</button>
+</div>
+</form>
+
+<div id="checkup-section">
+    {% if emp %}
+      {% include "partials/checkup_section.html" %}
+    {% endif %}
+  </div>
+  
+{% endblock %}

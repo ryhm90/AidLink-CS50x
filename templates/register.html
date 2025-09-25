@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 
-{% block title %}التسجيل{% endblock %}
+{% block title %}تسجيل منظمة جديدة{% endblock %}
 <style>
     .card {
-        background-image: url('{{ url_for('static', filename='Charity.png') }}');
+        background-image: url("{{ url_for('static', filename='Charity.png') }}");
         background-size: cover;
         background-repeat: no-repeat;
         color: white; /* Adjust text color for visibility */
@@ -25,44 +25,63 @@
         z-index: 1;
     }
 </style>
+<script>
+    var csrfToken = "{{ csrf_token() }}";
+</script>
+
 {% block main %}
 <div class="card shadow-lg p-3 mb-5 bg-white rounded card">
-
-<h1>إنشاء حساب جديد</h1>
-<form action="/register" method="POST">
-    <div class="mb-3">
-        <label for="username" class="form-label">اسم المستخدم</label>
-        <input type="text" class="form-control" id="username" name="username" required>
-    </div>
-    <div class="mb-3">
-        <label for="password" class="form-label">كلمة المرور</label>
-        <input type="password" class="form-control" id="password" name="password" required>
-    </div>
-    <div class="mb-3">
-        <label for="role" class="form-label">اختر الدور</label>
-        <select class="form-control" id="role" name="role" required onchange="toggleOrgNameField()">
-            <option selected value="ادارة">ادارة</option>
-            <option value="منظمة">منظمة</option>
-        </select>
-    </div>
-    <div class="mb-3" id="orgname-container" style="display: none;">
-        <label for="orgname" class="form-label">اسم المنظمة</label>
-        <input type="text" class="form-control" id="orgname" name="orgname">
-    </div>
-    <button type="submit" class="btn btn-primary">التسجيل</button>
-</form>
+    <h1>تسجيل منظمة جديدة</h1>
+    <form action="/register" method="POST">
+        <!-- CSRF Token -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <!-- رقم الموظف -->
+        <div class="mb-3">
+            <label for="id_no" class="form-label">الرقم الوظيفي</label>
+            <input type="text" class="form-control" id="id_no" name="id_no" required>
+        </div>
+        <!-- الاسم الثلاثي -->
+        <div class="mb-3">
+            <label for="name" class="form-label">الاسم الثلاثي</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <!-- اسم الدخول -->
+        <div class="mb-3">
+            <label for="user_name" class="form-label">اسم الدخول</label>
+            <input type="text" class="form-control" id="user_name" name="user_name" required>
+        </div>
+        <!-- الرقم السري -->
+        <div class="mb-3">
+            <label for="password" class="form-label">الرقم السري</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <!-- تأكيد الرقم السري -->
+        <div class="mb-3">
+            <label for="confirm_password" class="form-label">اعادة الرقم السري</label>
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+        </div>
+        <!-- الدور -->
+        <div class="mb-3">
+            <label for="role" class="form-label">الدور</label>
+            <input type="text" class="form-control" id="role" name="role" required>
+        </div>
+        <!-- الانتساب -->
+        <div class="mb-3">
+            <label for="department" class="form-label">الانتساب</label>
+            <input type="text" class="form-control" id="department" name="department" required>
+        </div>
+        <!-- الموقع -->
+        <div class="mb-3">
+            <label for="location" class="form-label">الموقع</label>
+            <input type="text" class="form-control" id="location" name="location" required>
+        </div>
+        <!-- رقم الهاتف -->
+        <div class="mb-3">
+            <label for="cell_phone" class="form-label">رقم الهاتف</label>
+            <input type="text" class="form-control" id="cell_phone" name="cell_phone" required>
+        </div>
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">التسجيل</button>
+    </form>
 </div>
-<script>
-    function toggleOrgNameField() {
-        const role = document.getElementById("role").value;
-        const orgNameContainer = document.getElementById("orgname-container");
-        if (role === "منظمة") {
-            orgNameContainer.style.display = "block";
-            document.getElementById("orgname").setAttribute("required", "required");
-        } else {
-            orgNameContainer.style.display = "none";
-            document.getElementById("orgname").removeAttribute("required");
-        }
-    }
-</script>
 {% endblock %}

@@ -1,0 +1,58 @@
+<div class="table-responsive">
+  <table class="table table-striped table-bordered align-middle text-center">
+    <thead class="table-light">
+      <tr>
+        <th style="min-width: 70px;">#</th>
+        <th class="text-center">الاسم</th>
+        <th style="min-width: 120px;">المخزون </th>
+        <th style="min-width: 120px;">المستلم</th>
+        <th style="min-width: 180px;">إجراءات</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if items %}
+        {% for it in items %}
+        <tr>
+          <td>{{ it.id }}</td>
+          <td class="text-center">{{ it.name }}</td>
+          <td>{{ it.stock }}</td>
+          <td>{{ it.delivered }}</td>
+          <td>
+            <button
+              class="btn btn-sm btn-warning me-1"
+              data-id="{{ it.id }}"
+              data-name="{{ it.name }}"
+              data-stock="{{ it.stock }}"
+              data-delivered="{{ it.delivered }}"
+              onclick="openEditModal(this)">
+              تعديل
+            </button>
+            <button
+              class="btn btn-sm btn-danger"
+              data-id="{{ it.id }}"
+              onclick="deleteEquipment(this)">
+              حذف
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="5" class="text-muted">لا توجد بيانات</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+{% if total_pages and total_pages > 1 %}
+<nav aria-label="صفحات" class="mt-2">
+  <ul class="pagination justify-content-center flex-wrap">
+    {% for p in range(1, total_pages + 1) %}
+      <li class="page-item {% if p == page %}active{% endif %}">
+        <a class="page-link" href="#" onclick="loadTable({{ p }}, '{{ q|default('') }}'); return false;">{{ p }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}

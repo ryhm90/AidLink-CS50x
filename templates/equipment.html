@@ -1,0 +1,189 @@
+{% extends "layout.html" %}
+{% block title %}إدارة المعدات{% endblock %}
+
+{% block main %}
+<div class="container py-3" dir="rtl">
+
+  <!-- العنوان + زر إضافة -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h3 class="mb-0">إدارة المعدات</h3>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">
+      <i class="bi bi-plus-circle"></i> إضافة معدّة
+    </button>
+  </div>
+
+  <!-- بطاقة البحث (أسلوب checkup) -->
+  <div class="card shadow-sm mb-3">
+    <div class="card-body">
+      <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-4">
+          <label class="form-label">بحث بالاسم</label>
+          <input id="searchInput" type="text" class="form-control" placeholder="ابحث عن معدّة...">
+        </div>
+        <div class="col-12 col-md-8 text-md-start text-end">
+          <button class="btn btn-outline-secondary" onclick="applySearch()">
+            <i class="bi bi-search"></i> بحث
+          </button>
+          <button class="btn btn-outline-dark" onclick="resetSearch()">
+            <i class="bi bi-arrow-repeat"></i> إعادة
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- جدول المعدات (partial) -->
+  <div id="equipment-table">
+    {% include "partials/equipment_section.html" %}
+  </div>
+</div>
+
+<!-- Modal: إضافة -->
+<div class="modal fade" id="addEquipmentModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="add-equipment-form" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">إضافة معدّة</h5>
+        <button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+          <label class="form-label">اسم المعدّة</label>
+          <input type="text" class="form-control" name="name" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">المخزون (stock)</label>
+          <input type="number" class="form-control" name="stock" min="0" value="0" required>
+        </div>
+        <div class="mb-1">
+          <label class="form-label">المستلم (delivered)</label>
+          <input type="number" class="form-control" name="delivered" min="0" value="0" required>
+        </div>
+        <small class="text-muted d-block">* يجب ألا يكون "المستلم" أكبر من "المخزون".</small>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">حفظ</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: تعديل -->
+<div class="modal fade" id="editEquipmentModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="edit-equipment-form" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">تعديل معدّة</h5>
+        <button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="id">
+        <div class="mb-3">
+          <label class="form-label">اسم المعدّة</label>
+          <input type="text" class="form-control" name="name" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">المخزون (stock)</label>
+          <input type="number" class="form-control" name="stock" min="0" required>
+        </div>
+        <div class="mb-1">
+          <label class="form-label">المستلم (delivered)</label>
+          <input type="number" class="form-control" name="delivered" min="0" required>
+        </div>
+        <small class="text-muted d-block">* يجب ألا يكون "المستلم" أكبر من "المخزون".</small>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">تحديث</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let currentPage = {{ page|default(1) }};
+  let currentQuery = "";
+
+  function loadTable(page = 1, q = "") {
+    currentPage = page;
+    currentQuery = q;
+    const url = new URL(window.location.origin + "/equipment_section");
+    url.searchParams.set("page", page);
+    if (q) url.searchParams.set("q", q);
+
+    fetch(url, { credentials: 'same-origin' })
+      .then(r => r.text())
+      .then(html => { document.getElementById('equipment-table').innerHTML = html; });
+  }
+
+  function applySearch() {
+    const q = document.getElementById('searchInput').value.trim();
+    loadTable(1, q);
+  }
+
+  function resetSearch() {
+    document.getElementById('searchInput').value = "";
+    loadTable(1, "");
+  }
+
+  // إضافة
+  document.getElementById('add-equipment-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    fetch('/equipment/add', { method: 'POST', body: fd, credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) {
+          loadTable(currentPage, currentQuery);
+          bootstrap.Modal.getInstance(document.getElementById('addEquipmentModal')).hide();
+          e.target.reset();
+        } else { alert(d.message || 'تعذر الإضافة'); }
+      });
+  });
+
+  // فتح مودال التعديل + تعبئة
+  function openEditModal(btn) {
+    const form = document.getElementById('edit-equipment-form');
+    form.id.value = btn.dataset.id;
+    form.name.value = btn.dataset.name;
+    form.stock.value = btn.dataset.stock;
+    form.delivered.value = btn.dataset.delivered;
+    new bootstrap.Modal(document.getElementById('editEquipmentModal')).show();
+  }
+
+  // تعديل
+  document.getElementById('edit-equipment-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    fetch('/equipment/edit', { method: 'POST', body: fd, credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) {
+          loadTable(currentPage, currentQuery);
+          bootstrap.Modal.getInstance(document.getElementById('editEquipmentModal')).hide();
+        } else { alert(d.message || 'تعذر التعديل'); }
+      });
+  });
+
+  // حذف
+  function deleteEquipment(btn) {
+    if (!confirm('هل أنت متأكد من الحذف؟')) return;
+    const fd = new FormData();
+    fd.append('csrf_token', '{{ csrf_token() }}');
+    fetch(`/equipment/delete/${btn.dataset.id}`, { method: 'POST', body: fd, credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) loadTable(currentPage, currentQuery);
+        else alert(d.message || 'تعذر الحذف');
+      });
+  }
+
+  // إتاحة الدوال عالميًا
+  window.openEditModal = openEditModal;
+  window.deleteEquipment = deleteEquipment;
+  window.loadTable = loadTable;
+  window.applySearch = applySearch;
+  window.resetSearch = resetSearch;
+</script>
+{% endblock %}

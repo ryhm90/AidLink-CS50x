@@ -1,0 +1,180 @@
+{% if emp %}
+
+<div class="card bg-light p-3 mb-3">
+  <div class="row small">
+    <div class="col-md-4 mb-2">
+      <strong>الاسم:</strong> {{ emp.name }}<br>
+      <strong>نوع العمل:</strong> {{ emp.type_work }}
+    </div>
+    <div class="col-md-4 mb-2">
+      <strong>الجنس:</strong> {{ emp.six_type }}<br>
+      <strong>الحالة الاجتماعية:</strong> {{ emp.mared }}<br>
+      <strong>موقع العمل:</strong> {{ emp.locat_na }}
+    </div>
+    <div class="col-md-4 mb-2">
+      <strong>تاريخ التعيين:</strong> {{ emp.date1 }}<br>
+      <strong>العنوان:</strong> {{ emp.addres }}
+    </div>
+    
+  </div>
+  <div class="text-center mt-2">
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addHelpModal">➕ إضافة منحة جديدة</button>
+  </div>
+</div>
+<!-- جدول المنح -->
+<div style="overflow-x:auto;">
+  <div style="overflow-x: auto; max-height: 350px;">
+  <table class="table table-bordered text-center small table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>التاريخ</th>
+        <th>تاريخ الجلسة</th>
+        <th>مبلغ المنحة</th>
+        <th>تفاصيل</th>
+        <th>إجراءات</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for h in helps %}
+      <tr>
+        <td>{{ h.date1 }}</td>
+        <td>{{ h.date2 }}</td>
+        <td>{{ h.pay }}</td>
+        <td>{{ h.detail }}</td>
+        <td>
+          <a href="#" class="text-warning me-2" data-bs-toggle="modal" data-bs-target="#editHelpModal_{{ h.id }}">
+            <i class="bi bi-pencil-square fs-5"></i>
+          </a>
+          <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteHelpModal_{{ h.id }}">
+            <i class="bi bi-trash fs-5"></i>
+          </a>
+        
+
+      <!-- Modal تعديل -->
+      <div class="modal fade" id="editHelpModal_{{ h.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <form class="modal-content" onsubmit="event.preventDefault(); updateHelp('{{ h.id }}');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="modal-header bg-warning text-white">
+              <h5 class="modal-title">✏️ تعديل منحة</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <input type="hidden" name="id" value="{{ h.id }}">
+              <input type="hidden" name="nono" value="{{ h.nono }}">
+              <input type="date" name="date1" class="form-control mb-2" value="{{ h.date1 }}" required>
+              <input type="date" name="date2" class="form-control mb-2" value="{{ h.date2 }}">
+              <input type="text" name="pay" class="form-control mb-2" value="{{ h.pay }}" required>
+              <input type="text" name="detail" class="form-control mb-2" value="{{ h.detail }}">
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-warning">تحديث</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal حذف -->
+      <div class="modal fade" id="deleteHelpModal_{{ h.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <form class="modal-content" onsubmit="event.preventDefault(); deleteHelp('{{ h.id }}');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="nono" value="{{ h.nono }}">
+            <input type="hidden" name="id" value="{{ h.id }}">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title">🗑 حذف منحة</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">هل أنت متأكد من حذف هذه المنحة؟</div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-danger">نعم</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </td>
+  </tr>
+  {% else %}
+        <tr><td colspan="6">لا توجد منح مسجلة</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% if total is defined %}
+  {% set total_pages = (total // per_page) + (1 if total % per_page else 0) %}
+{% set visible_pages = 2 %}
+{% set middle_range = 2 %}
+
+{% if total_pages > 1 %}
+<nav aria-label="Page navigation">
+<ul class="pagination justify-content-center mt-4">
+
+  <!-- أول صفحتين -->
+  {% for p in range(1, visible_pages + 1) %}
+    {% if p <= total_pages %}
+    <li class="page-item {% if p == page %}active{% endif %}">
+      <a class="page-link" href="{{ url_for('help_page', page=p, nono=nono) }}">{{ p }}</a>
+
+    </li>
+    {% endif %}
+  {% endfor %}
+
+  {% if page > visible_pages + middle_range + 1 and total_pages > visible_pages * 2 %}
+    <li class="page-item disabled"><span class="page-link">...</span></li>
+  {% endif %}
+
+  <!-- صفحات حول الصفحة الحالية -->
+  {% for p in range(page - middle_range, page + middle_range + 1) %}
+    {% if p > visible_pages and p < total_pages - visible_pages + 1 %}
+      <li class="page-item {% if p == page %}active{% endif %}">
+        <a class="page-link" href="{{ url_for('help_page', page=p, nono=nono) }}">{{ p }}</a>
+      </li>
+    {% endif %}
+  {% endfor %}
+
+  {% if page < total_pages - visible_pages - middle_range and total_pages > visible_pages * 2 %}
+    <li class="page-item disabled"><span class="page-link">...</span></li>
+  {% endif %}
+
+  <!-- آخر صفحتين -->
+  {% for p in range(total_pages - visible_pages + 1, total_pages + 1) %}
+    {% if p > visible_pages %}
+    <li class="page-item {% if p == page %}active{% endif %}">
+      <a class="page-link" href="{{ url_for('help_page', page=p, nono=nono) }}">{{ p }}</a>
+    </li>
+    {% endif %}
+  {% endfor %}
+
+</ul>
+</nav>
+{% endif %}
+{% endif %}
+</div>
+
+<!-- Modal الإضافة -->
+<div class="modal fade" id="addHelpModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="modal-content" id="addHelpForm" onsubmit="event.preventDefault(); saveHelp();">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="nono" value="{{ emp.nono }}">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">➕ إضافة منحة</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="date" name="date1" class="form-control mb-2" required>
+        <input type="date" name="date2" class="form-control mb-2">
+        <input type="text" name="pay" class="form-control mb-2" placeholder="المبلغ" required>
+        <input type="text" name="detail" class="form-control mb-2" placeholder="تفاصيل">
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">حفظ</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endif %}

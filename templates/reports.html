@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block title %}صفحة التقارير{% endblock %}
+{% block main %}
+<script>
+  var csrfToken = "{{ csrf_token() }}";
+</script>
+
+<h4 class="mb-4">📊 التقارير</h4>
+
+<form id="reportForm" class="mb-4" onsubmit="event.preventDefault(); loadReport();">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label for="nono" class="form-label">رقم الموظف</label>
+      <input type="text" name="nono" class="form-control" placeholder="ادخل رقم الموظف">
+    </div>
+    <div class="col-md-4">
+      <label for="from_date" class="form-label">من تاريخ</label>
+      <input type="date" name="from_date" class="form-control">
+    </div>
+    <div class="col-md-4">
+      <label for="to_date" class="form-label">إلى تاريخ</label>
+      <input type="date" name="to_date" class="form-control">
+    </div>
+    <div class="col-md-12 mt-3">
+      <button type="submit" name="report_type" value="checkup_detail" class="btn btn-outline-primary" onclick="setType(this)">📄 فحص موظف</button>
+      <button type="submit" name="report_type" value="checkup_all" class="btn btn-outline-primary" onclick="setType(this)">📄 فحوصات الجميع</button>
+      <button type="submit" name="report_type" value="help_detail" class="btn btn-outline-success" onclick="setType(this)">💰 مساعدات موظف</button>
+      <button type="submit" name="report_type" value="help_all" class="btn btn-outline-success" onclick="setType(this)">💰 مساعدات الجميع</button>
+      <button type="submit" name="report_type" value="items_detail" class="btn btn-outline-dark" onclick="setType(this)">🛠️ معدات موظف</button>
+      <button type="submit" name="report_type" value="items_all" class="btn btn-outline-dark" onclick="setType(this)">🛠️ معدات الجميع</button>
+    </div>
+  </div>
+</form>
+
+<div id="report_section">{% include "partials/report_section.html" %}</div>
+
+<script>
+  let selectedType = "";
+
+  function setType(button) {
+    selectedType = button.value;
+  }
+
+  async function loadReport() {
+    const form = document.getElementById("reportForm");
+    const formData = new FormData(form);
+    formData.set("report_type", selectedType);
+
+    const response = await fetch("/reports", {
+      method: "POST",
+      body: formData,
+    });
+
+    const html = await response.text();
+    document.getElementById("report_section").innerHTML = html;
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends "layout.html" %}
+{% block title %}المعدات الشخصية{% endblock %}
+{% block main %}
+<script>
+    var csrfToken = "{{ csrf_token() }}";
+</script>
+
+<h4 class="mb-4">🛠️ تسليم معدات شخصية</h4>
+
+<form id="searchForm" class="mb-3" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="input-group">
+        <input type="text" name="nono" class="form-control" placeholder="أدخل الرقم الوظيفي" required>
+        <button type="submit" class="btn btn-primary">بحث</button>
+    </div>
+</form>
+
+<div id="items_section">
+    {% include "partials/items_section.html" %}
+</div>
+
+<!-- مودال إضافة المواد -->
+<div class="modal fade" id="additemsModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <form id="addItemForm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">➕ إضافة مادة</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="offi_no" value="{{ emp.nono if emp }}">
+          <input type="hidden" name="offi_name" value="{{ emp.name if emp }}">
+          <input type="hidden" name="offi_addres" value="{{ emp.addres if emp }}">
+          <input type="hidden" name="offi_cost_name" value="{{ emp.locat_na if emp }}">
+          <input type="hidden" name="offi_cost_no" value="{{ emp.locat_no if emp }}">
+
+          <div class="mb-3">
+            <label class="form-label">اختر المادة</label>
+            <select name="moad_name" class="form-select" required>
+              {% for item in moad %}
+                <option value="{{ item.name }}">{{ item.name }} (المخزون: {{ item.stock - item.delivered }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">تاريخ التسليم</label>
+            <input type="date" name="date_astlam" class="form-control" required>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">💾 حفظ</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- مودال حذف -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form id="deleteItemForm">
+      <input type="hidden" name="id" id="delete_id">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">تأكيد الحذف</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>هل أنت متأكد من حذف هذا السجل؟</p>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">🗑️ حذف</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.getElementById('searchForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const form = e.target;
+  const res = await fetch('/items', {
+    method: 'POST',
+    body: new FormData(form)
+  });
+  const html = await res.text();
+  document.getElementById('items_section').innerHTML = html;
+});
+
+document.getElementById('addItemForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const form = e.target;
+  const res = await fetch('/items/add', {
+    method: 'POST',
+    body: new FormData(form)
+  });
+  if (res.ok) {
+    const html = await res.text();
+    document.getElementById('items_section').innerHTML = html;
+    bootstrap.Modal.getInstance(document.getElementById('additemsModal')).hide();
+  }
+});
+
+document.getElementById('deleteItemForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const form = e.target;
+  const res = await fetch('/items/delete', {
+    method: 'POST',
+    body: new FormData(form)
+  });
+  if (res.ok) {
+    const html = await res.text();
+    document.getElementById('items_section').innerHTML = html;
+    bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+  }
+});
+
+function confirmDelete(id) {
+  document.getElementById('delete_id').value = id;
+  new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+
+{% endblock %}

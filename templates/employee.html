@@ -1,0 +1,120 @@
+{% extends "layout.html" %}
+{% block title %}إدارة الموظفين{% endblock %}
+{% block main %}
+<script>
+    var csrfToken = "{{ csrf_token() }}";
+</script>
+
+<!-- ✅ Toasts -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+  <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body">✅ تمت العملية بنجاح</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+
+  <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert">
+    <div class="d-flex">
+      <div id="errorToastMessage" class="toast-body">❌ حدث خطأ أثناء العملية</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ البحث والإضافة -->
+<div class="card shadow p-4">
+  <form method="POST" action="{{ url_for('search_employees') }}" class="row mb-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="col-md-4">
+      <input type="text" name="keyword" class="form-control" placeholder="بحث بالاسم أو رقم الجهة" value="{{ keyword or '' }}">
+    </div>
+    <div class="col-md-4">
+      <select name="locat_na" class="form-control">
+        <option value="">كل المواقع</option>
+        {% for loc in locations %}
+        <option value="{{ loc }}" {% if loc == locat_na %}selected{% endif %}>{{ loc }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4 d-flex gap-2">
+      <button type="submit" class="btn btn-primary">🔍 بحث</button>
+      <a href="{{ url_for('export_employees_excel', keyword=keyword, locat_na=locat_na) }}" class="btn btn-outline-success">📄 تصدير Excel</a>
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+        ➕ إضافة موظف جديد
+      </button>
+    </div>
+  </form>
+
+  <!-- ✅ قسم الموظفين -->
+  <div id="employee-section">
+    {% include "partials/employee_section.html" %}
+  </div>
+</div>
+
+<!-- ✅ مودال الإضافة -->
+<div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="addEmployeeForm" class="modal-content" onsubmit="event.preventDefault(); saveEmployee();">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">إضافة موظف</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        {% for label, name, type in [
+          ('رقم الجهة', 'nono', 'text'),
+          ('الاسم', 'name', 'text'),
+          ('نوع العمل', 'type_work', 'text'),
+          ('الجنس', 'six_type', 'select'),
+          ('الحالة الاجتماعية', 'mared', 'select'),
+          ('تاريخ التعيين', 'date1', 'date'),
+          ('العنوان', 'addres', 'text'),
+          ('الموقع', 'locat_na', 'select')
+        ] %}
+        <div class="mb-3">
+          <label class="form-label">{{ label }}</label>
+          {% if type == 'select' %}
+            <select name="{{ name }}" class="form-control">
+              {% if name == 'six_type' %}
+              <option>ذكر</option><option>أنثى</option>
+              {% elif name == 'mared' %}
+              <option>أعزب</option><option>متزوج</option>
+              {% elif name == 'locat_na' %}
+              {% for loc in locations %}<option value="{{ loc }}">{{ loc }}</option>{% endfor %}
+              {% endif %}
+            </select>
+          {% else %}
+            <input type="{{ type }}" name="{{ name }}" class="form-control" required>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">💾 حفظ</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+async function saveEmployee() {
+  const form = document.getElementById("addEmployeeForm");
+  const formData = new FormData(form);
+  try {
+    const res = await fetch("/add_employee", {
+      method: "POST",
+      body: formData
+    });
+    const html = await res.text();
+    document.getElementById("employee-section").innerHTML = html;
+    bootstrap.Modal.getInstance(document.getElementById("addEmployeeModal")).hide();
+    new bootstrap.Toast(document.getElementById("successToast")).show();
+  } catch (err) {
+    document.getElementById("errorToastMessage").innerText = "❌ حدث خطأ أثناء الإضافة";
+    new bootstrap.Toast(document.getElementById("errorToast")).show();
+  }
+}
+</script>
+{% endblock %}

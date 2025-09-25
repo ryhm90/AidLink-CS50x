@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+{% block title %}منح الموظفين{% endblock %}
+{% block main %}
+<script>
+  var csrfToken = "{{ csrf_token() }}";
+</script>
+<!-- ✅ Toasts -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+  <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body">✅ تمت العملية بنجاح</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+
+  <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert">
+    <div class="d-flex">
+      <div id="errorToastMessage" class="toast-body">❌ حدث خطأ أثناء العملية</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+<h4 class="mb-3">المساعدات المالية</h4>
+<form method="POST" id="searchForm" class="row g-2 mb-4" onsubmit="event.preventDefault(); searchHelp();">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="col-auto">
+    <input type="text" name="nono" id="nonoInput" class="form-control" placeholder="رقم الموظف" required>
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary">🔍 بحث</button>
+  </div>
+</form>
+
+<div id="help-section">{% include 'partials/help_section.html' %}</div>
+  
+<script>
+  async function searchHelp() {
+    const formData = new FormData(document.getElementById('searchForm'));
+    const response = await fetch('/help', {
+      method: 'POST',
+      body: formData
+    });
+    const html = await response.text();
+    document.getElementById('help-section').innerHTML = html;
+  }
+</script>
+<script>
+  async function saveHelp() {
+    const form = document.getElementById("addHelpForm");
+    const formData = new FormData(form);
+    console.log('1')
+    const res = await fetch("/help/save", {
+      method: "POST",
+      body: formData,
+    });
+    console.log('2')
+    const html = await res.text();
+    document.getElementById("help-section").innerHTML = html;
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addHelpModal'));
+        if (modal) modal.hide();
+        document.body.classList.remove('modal-open');
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+        new bootstrap.Toast(document.getElementById("successToast")).show();
+
+  }
+
+  async function updateHelp(id, nono) {
+  const form = document.querySelector(`#editHelpModal_${id} form`);
+  const formData = new FormData(form);
+  const res = await fetch("/help/update", {
+    method: "POST",
+    body: formData
+  });
+
+    const html = await res.text();
+    document.getElementById("help-section").innerHTML = html;
+    const modal = bootstrap.Modal.getInstance(document.getElementById(`editHelpModal_${id}`));
+        if (modal) modal.hide();
+        document.body.classList.remove('modal-open');
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+        new bootstrap.Toast(document.getElementById("successToast")).show();
+
+  }
+
+  async function deleteHelp(id, nono) {
+    const form = document.querySelector(`#deleteHelpModal_${id} form`);
+    const formData = new FormData(form);
+    const res = await fetch("/help/delete", {
+      method: "POST",
+      body: formData,
+    });
+    const html = await res.text();
+    document.getElementById("help-section").innerHTML = html;
+    const modal = bootstrap.Modal.getInstance(document.getElementById(`deleteHelpModal_${id}`));
+        if (modal) modal.hide();
+        document.body.classList.remove('modal-open');
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+        new bootstrap.Toast(document.getElementById("successToast")).show();
+
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,127 @@
+<h5>قائمة الموظفين</h5>
+<div style="overflow-x:auto; max-height: 400px;">
+  <table class="table table-bordered text-center small table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>رقم الجهة</th>
+        <th>الاسم</th>
+        <th>نوع العمل</th>
+        <th>الموقع</th>
+        <th>إجراءات</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for emp in employees %}
+      <tr>
+        <td>{{ emp.nono }}</td>
+        <td>{{ emp.name }}</td>
+        <td>{{ emp.type_work }}</td>
+        <td>{{ emp.locat_na }}</td>
+        <td>
+          <a href="#" class="text-warning me-2" data-bs-toggle="modal" data-bs-target="#editModal_{{ emp.id }}">
+            <i class="bi bi-pencil-square fs-5"></i>
+          </a>
+          <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal_{{ emp.id }}">
+            <i class="bi bi-trash fs-5"></i>
+          </a>
+        
+
+      <!-- Modal التعديل -->
+      <div class="modal fade" id="editModal_{{ emp.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <form class="modal-content" id="editForm_{{ emp.id }}" onsubmit="event.preventDefault(); updateEmployee('{{ emp.id }}');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="modal-header bg-warning text-white">
+              <h5 class="modal-title">✏️ تعديل الموظف</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <input type="text" name="id" class="form-control mb-2" value="{{ emp.id }}" >
+              <input type="text" name="nono" class="form-control mb-2" value="{{ emp.nono }}" required>
+              <input type="text" name="name" class="form-control mb-2" value="{{ emp.name }}" required>
+              <input type="text" name="type_work" class="form-control mb-2" value="{{ emp.type_work }}">
+              <input type="text" name="six_type" class="form-control mb-2" value="{{ emp.six_type }}">
+              <input type="text" name="mared" class="form-control mb-2" value="{{ emp.mared }}">
+              <input type="date" name="date1" class="form-control mb-2" value="{{ emp.date1 }}">
+              <input type="text" name="addres" class="form-control mb-2" value="{{ emp.addres }}">
+              <input type="text" name="locat_no" class="form-control mb-2" value="{{ emp.locat_no }}">
+              <select name="locat_na" class="form-control">
+                {% for loc in locations %}
+                <option value="{{ loc }}" {% if loc == emp.locat_na %}selected{% endif %}>{{ loc }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-warning">تحديث</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal الحذف -->
+      <div class="modal fade" id="deleteModal_{{ emp.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <form class="modal-content" id="deleteForm_{{ emp.id }}" onsubmit="event.preventDefault(); deleteEmployee('{{ emp.id }}');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title">🗑 تأكيد الحذف</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              هل أنت متأكد من حذف الموظف <strong>{{ emp.name }}</strong>؟
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-danger">نعم، حذف</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </td>
+  </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+async function updateEmployee(id) {
+  const form = document.getElementById(`editForm_${id}`);
+  const formData = new FormData(form);
+    const res = await fetch(`/edit_employee/${id}`, {
+      method: "POST",
+      body: formData
+    });
+    const html = await res.text();
+    document.getElementById("employee-section").innerHTML = html;
+    const modal = bootstrap.Modal.getInstance(document.getElementById(`editModal_${id}`));
+    if (modal) modal.hide();
+    document.body.classList.remove('modal-open');
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+
+    new bootstrap.Toast(document.getElementById("successToast")).show();
+}
+
+async function deleteEmployee(id) {
+  const form = document.getElementById(`deleteForm_${id}`);
+  const formData = new FormData(form);
+  try {
+    const res = await fetch(`/delete_employee/${id}`, {
+      method: "POST",
+      body: formData
+    });
+    const html = await res.text();
+    document.getElementById("employee-section").innerHTML = html;
+    const modal = bootstrap.Modal.getInstance(document.getElementById(`deleteModal_${id}`));
+    if (modal) modal.hide();
+    document.body.classList.remove('modal-open');
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+
+    new bootstrap.Toast(document.getElementById("successToast")).show();
+  } catch (err) {
+    document.getElementById("errorToastMessage").innerText = "❌ حدث خطأ أثناء الحذف";
+    new bootstrap.Toast(document.getElementById("errorToast")).show();
+  }
+}
+</script>

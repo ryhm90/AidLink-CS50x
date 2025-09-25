@@ -1,0 +1,55 @@
+
+
+{% if emp %}
+<div class="card bg-light p-3 mb-3">
+  <div class="row small">
+    <div class="col-md-4 mb-2"><strong>الاسم:</strong> {{ emp.name }}<br><strong>نوع العمل:</strong> {{ emp.type_work }}</div>
+    <div class="col-md-4 mb-2"><strong>الجنس:</strong> {{ emp.six_type }}<br><strong>الحالة الاجتماعية:</strong> {{ emp.mared }}<br><strong>موقع العمل:</strong> {{ emp.locat_na }}</div>
+    <div class="col-md-4 mb-2"><strong>تاريخ التعيين:</strong> {{ emp.date1 }}<br><strong>العنوان:</strong> {{ emp.addres }}</div>
+  </div>
+</div>
+{% endif %}
+
+{% if results %}
+<hr>
+<h5 class="mb-3">نتائج التقرير:</h5>
+<div class="d-flex justify-content-end mb-3">
+  <a href="{{ url_for('export_report_pdf', report_type=report_type, nono=request.form.get('nono'), from_date=request.form.get('from_date'), to_date=request.form.get('to_date')) }}" class="btn btn-outline-secondary">⬇️ تصدير PDF</a>
+</div>
+<div class="table-responsive">
+  <table class="table table-striped table-bordered text-center align-middle">
+  <thead>
+    <tr>
+      {# نعرض العناوين المعرّبة #}
+      {% for col_title in columns_mapped %}
+        <th>{{ col_title }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in results %}
+      <tr>
+        {# نقرأ القيم بنفس ترتيب الأعمدة الأصلية لضمان التطابق #}
+        {% for col in columns %}
+          {# لو row كائن Mapping (dict-like) استخدم المفاتيح، غير ذلك استخدم الفهارس #}
+          {% if row is mapping %}
+            <td>{{ row[col] }}</td>
+          {% else %}
+            <td>{{ row[loop.index0] }}</td>
+          {% endif %}
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{# اختيارياً: عرض فترة التاريخ إذا موجودة #}
+{% if from_date and to_date %}
+  <div class="text-end mt-2 small text-muted">
+    الفترة: من {{ from_date }} إلى {{ to_date }}
+  </div>
+{% endif %}
+
+</div>
+{% endif %}
+
